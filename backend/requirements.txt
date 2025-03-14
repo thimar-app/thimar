@@ -1,0 +1,12 @@
+Django>=3.2,<4.2
+djangorestframework>=3.12,<3.14
+django-oauth-toolkit>=1.6
+psycopg2-binary>=2.8
+django-cors-headers>=3.5
+django-environ==0.12.0
+# Prayer times library
+religious-times==2.6  
+# Optional caching support
+django-redis>=4.12 
+# API documentation
+drf-yasg>=1.20
