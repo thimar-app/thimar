@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from tasks.utils import update_prayer_times_for_user
 
 User = get_user_model()
 
@@ -13,6 +14,10 @@ class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
+
+    # def perform_create(self, serializer):
+    #     user = serializer.save()
+    #     update_prayer_times_for_user(user)
 
 # Authenticated user profile view
 class UserProfileView(generics.RetrieveUpdateAPIView):
