@@ -18,3 +18,15 @@ class Goal(models.Model):
 
     def __str__(self):
         return self.title
+
+# moels.py/ SubGoal
+
+class SubGoal(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    goal = models.ForeignKey(Goal, on_delete=models.CASCADE, related_name="sub_goals")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
