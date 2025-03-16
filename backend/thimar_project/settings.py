@@ -35,17 +35,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
+DEBUG = False
 
-
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = [
-    'thimar-production.up.railway.app',
-    'localhost',
-]
-
-# Ensure Django picks up Railway's PORT
-PORT = os.getenv("PORT", "8080")
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
