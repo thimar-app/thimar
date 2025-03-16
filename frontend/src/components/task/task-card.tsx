@@ -31,6 +31,7 @@ interface Task {
 interface TaskItemProps {
   task: Task;
   index: number;
+  showGoals?: boolean;
   moveTask: (dragIndex: number, hoverIndex: number) => void;
   toggleTaskStatus: (id: string) => void;
   onDelete: (id: string) => void;
@@ -69,13 +70,14 @@ const priorityVariantMap = {
   Urgent: "destructive",
 };
 
-const TaskItem: React.FC<TaskItemProps> = ({
+const TaskCard: React.FC<TaskItemProps> = ({
   task,
   index,
   moveTask,
   toggleTaskStatus,
   onDelete,
   onEdit,
+  showGoals = false,
 }) => {
   const ref = React.useRef<HTMLLIElement>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -192,19 +194,31 @@ const TaskItem: React.FC<TaskItemProps> = ({
         />
 
         <div className="flex flex-col gap-0.5 flex-1">
-          <label
-            htmlFor={`task-${task.id}`}
-            className={
-              task.status ? "line-through text-muted-foreground" : "font-medium"
-            }
-          >
-            {task.name}
-          </label>
+          <div className="flex">
+            <label
+              htmlFor={`task-${task.id}`}
+              className={
+                task.status
+                  ? "line-through text-muted-foreground"
+                  : "font-medium"
+              }
+            >
+              {task.name}
+            </label>
+
+            {showGoals && (
+              <div className=" ml-auto gap-1 items-center flex">
+                <span className="text-sm text-muted-foreground">
+                  {task.name}
+                </span>
+              </div>
+            )}
+          </div>
           {task.description && (
             <p className="text-sm text-muted-foreground">{task.description}</p>
           )}
 
-          <div className="flex gap-2 mt-1 items-center flex-wrap">
+          <div className="flex gap-2 mt-1 items-center h-6 flex-wrap">
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
@@ -225,26 +239,26 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 <span className="text-xs text-purple-500">Recurring</span>
               </div>
             )}
-          </div>
-        </div>
 
-        <div className="ml-auto gap-1 items-center group-hover:flex hidden">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="hover:bg-neutral-200 size-6 text-muted-foreground"
-            onClick={handleEditClick}
-          >
-            <PenLine className="h-4 w-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="hover:bg-neutral-200 size-6 text-muted-foreground"
-            onClick={handleDeleteClick}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+            <div className="ml-auto gap-1 items-center group-hover:flex hidden">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:bg-neutral-200 size-6 text-muted-foreground"
+                onClick={handleEditClick}
+              >
+                <PenLine className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:bg-neutral-200 size-6 text-muted-foreground"
+                onClick={handleDeleteClick}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </li>
 
@@ -258,7 +272,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   );
 };
 
-export default TaskItem;
+export default TaskCard;
 
 const DeleteDialog: React.FC<DeleteDialogProps> = ({
   isOpen,
