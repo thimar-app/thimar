@@ -12,12 +12,20 @@ class Goal(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="goals/images/", blank=True, null=True)
-    progress = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
+    
+    @property
+    def progress(self):
+        total_tasks = sum(subgoal.tasks.count() for subgoal in self.sub_goals.all())
+        if total_tasks == 0:
+            return 0
+        finished_tasks = sum(subgoal.tasks.filter(status=True).count() for subgoal in self.sub_goals.all())
+        return (finished_tasks / total_tasks) * 100
+
 
 # moels.py/ SubGoal
 

@@ -3,10 +3,11 @@ from .models import Goal
 from .models import SubGoal
 
 class GoalSerializer(serializers.ModelSerializer):
+    progress = serializers.ReadOnlyField()
     class Meta:
         model = Goal
         fields = '__all__'
-        read_only_fields = ('id','user', 'created_at', 'updated_at')
+        read_only_fields = ('id','user','progress', 'created_at', 'updated_at')
 
 
 
