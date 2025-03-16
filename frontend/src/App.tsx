@@ -1,11 +1,19 @@
-import { Button } from "@/components/ui/button";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./Layout";
+import Home from "@/components/pages/home/index";
+import { Button } from "./components/ui/button";
 
-function App() {
+const App = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tasks" element={<Button />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
-}
+};
 
 export default App;
