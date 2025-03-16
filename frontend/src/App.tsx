@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
-import Home from "@/components/pages/home/index";
-import { Button } from "./components/ui/button";
+import Home from "@/components/pages/home";
+import Goals from "@/components/pages/goals";
+import GoalDetails from "@/components/pages/goalDetails"; // Rename Tasks to GoalDetails
 
 const App = () => {
   return (
@@ -9,7 +10,8 @@ const App = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/tasks" element={<Button />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/goals/:goalId" element={<GoalDetails />} />
         </Routes>
       </Layout>
     </Router>
