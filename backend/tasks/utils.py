@@ -8,6 +8,16 @@ def update_prayer_times_for_user(user):
         return  # no location => no calculation
     
     pt = PrayTimes()
+
+    # Monkey-patch the 'MWL' method if it's a dict
+    if isinstance(pt.methods['MWL'], dict):
+        class MethodWrapper:
+            def __init__(self, method_dict):
+                # If the dictionary already has a key 'params', use it,
+                # otherwise, use the entire dict as parameters.
+                self.params = method_dict.get('params', method_dict)
+        pt.methods['MWL'] = MethodWrapper(pt.methods['MWL'])
+
     pt.setMethod('MWL')
 
     now = timezone.now()

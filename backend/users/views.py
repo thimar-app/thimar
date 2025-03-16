@@ -15,9 +15,9 @@ class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
 
-    # def perform_create(self, serializer):
-    #     user = serializer.save()
-    #     update_prayer_times_for_user(user)
+    def perform_create(self, serializer):
+        user = serializer.save()
+        update_prayer_times_for_user(user)
 
 # Authenticated user profile view
 class UserProfileView(generics.RetrieveUpdateAPIView):
