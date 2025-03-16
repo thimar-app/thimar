@@ -16,6 +16,7 @@ djangorestframework-simplejwt = "==5.3.1"
 pillow = ">=10.4.0"
 celery = "*"
 praytimes = "*"
+gunicorn = "*"
 
 [dev-packages]
 

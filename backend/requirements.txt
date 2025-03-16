@@ -6,6 +6,7 @@ django-environ==0.12.0
 djangorestframework-simplejwt==5.3.1
 Pillow>=10.4.0
 celery==5.4.0
+gunicorn
 # Prayer times library
 praytimes
 celery
