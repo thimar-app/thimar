@@ -52,7 +52,7 @@
   --secondary: #363636;
   --secondary-foreground: hsl(210 20% 98%);
   --muted: #262626;
-  --muted-foreground: hsl(240 5% 64.9%);
+  --muted-foreground: #a1a1aa;
   --accent: #474747;
   --accent-foreground: hsl(210 20% 98%);
   --destructive: hsl(0 62.8% 30.6%);
