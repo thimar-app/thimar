@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import GoalsHeader from "./header";
@@ -8,7 +8,6 @@ import GoalCard from "./goal-card";
 import { useGoalContext } from "@/context/GoalContext";
 
 export default function Goals() {
-  const navigate = useNavigate();
   const { goals, addGoal, calculateOverallProgress } = useGoalContext();
   const [progress, setProgress] = useState(0);
 
@@ -34,11 +33,6 @@ export default function Goals() {
 
     // Add the goal to context
     addGoal(emptyGoal);
-
-    // Redirect to the new goal's page
-    setTimeout(() => {
-      navigate(`/goals/${newGoalId}`); // Wait before navigating
-    }, 100);
   };
 
   return (

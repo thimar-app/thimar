@@ -17,13 +17,22 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
+
+function shortenTitle(title: string) {
+  if (title.length > 30) {
+    return title.substring(0, 24) + "...";
+  } else {
+    return title;
+  }
+}
 
 export function NavGoals({
   goals,
 }: {
   goals: {
     name: string;
-    emoji: React.ReactNode;
+    link: string;
   }[];
 }) {
   return (
@@ -43,12 +52,11 @@ export function NavGoals({
                 <SidebarMenuSub>
                   {goals.map((goal) => (
                     <SidebarMenuSubItem key={goal.name}>
-                      <SidebarMenuSubButton asChild className="px-1">
-                        <a href="#">
-                          <span>{goal.emoji}</span>
-                          <span>{goal.name}</span>
-                        </a>
-                      </SidebarMenuSubButton>
+                      <Link to={`/goals/${goal.link}`} className="block">
+                        <SidebarMenuSubButton asChild className="px-1">
+                          <span>{shortenTitle(goal.name)}</span>
+                        </SidebarMenuSubButton>
+                      </Link>
                     </SidebarMenuSubItem>
                   ))}
                 </SidebarMenuSub>

@@ -1,11 +1,12 @@
 import { EditTaskCard } from "@/components/task/edit-task-card";
-import TaskItem from "@/components/task/task-item";
-import React from "react";
+import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTaskContext } from "@/context/TaskContext";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
+import { AddTaskCard } from "@/components/task/add-task-card";
+import TaskCard from "@/components/task/task-card";
 
 interface Task {
   id: string;
@@ -21,10 +22,12 @@ interface Task {
 
 interface SimpleListViewProps {
   showCompletedTasks: boolean;
+  showGoals?: boolean;
   onEditTask?: (task: Task) => void;
 }
 
 const SimpleListView: React.FC<SimpleListViewProps> = ({
+  showGoals = false,
   showCompletedTasks,
   onEditTask,
 }) => {
@@ -37,6 +40,8 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
     editingTask,
     setEditingTask,
   } = useTaskContext();
+
+  const [isAddingTask, setIsAddingTask] = useState(false);
 
   // Filter tasks based on showCompletedTasks
   const filteredTasks = showCompletedTasks
@@ -66,7 +71,7 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
                 }}
               />
             ) : (
-              <TaskItem
+              <TaskCard
                 key={task.id}
                 task={task}
                 index={index}
@@ -74,16 +79,20 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
                 toggleTaskStatus={toggleTaskStatus}
                 onDelete={deleteTask}
                 onEdit={handleEditTask}
+                showGoals={showGoals}
               />
             )
           )}
         </ul>
+        {isAddingTask && <AddTaskCard onClose={() => setIsAddingTask(false)} />}
+
         <Button
-          variant={"ghost"}
+          variant="ghost"
           className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
+          onClick={() => setIsAddingTask(true)}
         >
           <CirclePlus className="!size-5" strokeWidth={1} />
-          <span className="">Add Task</span>
+          Add Task
         </Button>
       </div>
     </DndProvider>
