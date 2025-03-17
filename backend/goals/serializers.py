@@ -5,7 +5,9 @@ import cloudinary
 
 class GoalSerializer(serializers.ModelSerializer):
     progress = serializers.ReadOnlyField()
-    image = serializers.SerializerMethodField()
+    # image = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False)  # Allow updates to the image
+
 
     class Meta:
         model = Goal

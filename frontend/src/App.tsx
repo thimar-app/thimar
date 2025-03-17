@@ -4,9 +4,11 @@ import Home from "@/components/pages/home";
 import Goals from "@/components/pages/goals";
 import GoalDetails from "@/components/pages/goalDetails";
 import Tasks from "./components/pages/tasks";
+import { GoalProvider } from "./context/GoalContext";
 
 const App = () => {
   return (
+    <GoalProvider>
     <Router>
       <Layout>
         <Routes>
@@ -17,6 +19,7 @@ const App = () => {
         </Routes>
       </Layout>
     </Router>
+    </GoalProvider>
   );
 };
 
