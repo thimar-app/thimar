@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Ellipsis } from "lucide-react";
 
 import {
   Collapsible,
@@ -29,7 +29,9 @@ function shortenTitle(title: string) {
 
 export function NavGoals({
   goals,
+  showMore,
 }: {
+  showMore: boolean;
   goals: {
     name: string;
     link: string;
@@ -59,6 +61,16 @@ export function NavGoals({
                       </Link>
                     </SidebarMenuSubItem>
                   ))}
+
+                  {showMore && (
+                    <SidebarMenuSubItem>
+                      <Link to={`/goals`} className="block">
+                        <SidebarMenuSubButton>
+                          <Ellipsis /> More
+                        </SidebarMenuSubButton>
+                      </Link>
+                    </SidebarMenuSubItem>
+                  )}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>

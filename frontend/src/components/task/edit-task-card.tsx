@@ -6,18 +6,7 @@ import { PriorityPopover } from "./priority-popover";
 import { DatePopover } from "./date-popover";
 import { ProjectSelect } from "./project-select";
 import { Switch } from "@/components/ui/switch";
-
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "@/db/goals";
 
 interface EditTaskCardProps {
   task: Task;
@@ -70,7 +59,7 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
     }));
   };
 
-  const handleProjectChange = (subGoalId: string | null) => {
+  const handleProjectChange = (subGoalId: string) => {
     setEditedTask((prev) => ({
       ...prev,
       sub_goal_id: subGoalId,

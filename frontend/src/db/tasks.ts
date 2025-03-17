@@ -1,14 +1,4 @@
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "./goals";
 
 export const mockTasks: Task[] = [
   {
@@ -16,7 +6,7 @@ export const mockTasks: Task[] = [
     name: "Set up project repository",
     description: "Initialize Git repository and set up basic folder structure",
     date: new Date("2025-03-20"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Medium",
     status: true,
@@ -27,7 +17,7 @@ export const mockTasks: Task[] = [
     name: "Create database schema",
     description: "",
     date: new Date("2025-03-22"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "High",
     status: false,
@@ -38,7 +28,7 @@ export const mockTasks: Task[] = [
     name: "Implement user authentication",
     description: "Create login, registration, and password reset functionality",
     date: new Date("2025-03-25"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "High",
     status: false,
@@ -49,7 +39,7 @@ export const mockTasks: Task[] = [
     name: "Create API endpoints",
     description: "Develop RESTful API endpoints for core functionality",
     date: new Date("2025-03-28"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Medium",
     status: false,
@@ -60,7 +50,7 @@ export const mockTasks: Task[] = [
     name: "Set up frontend framework",
     description: "Initialize React/Vue/Angular project and configure routing",
     date: new Date("2025-03-30"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Medium",
     status: false,
@@ -82,7 +72,7 @@ export const mockTasks: Task[] = [
     name: "Write unit tests",
     description: "",
     date: new Date("2025-04-05"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Low",
     status: false,
@@ -93,7 +83,7 @@ export const mockTasks: Task[] = [
     name: "Implement data validation",
     description: "Add input validation and sanitization for all forms",
     date: new Date("2025-04-08"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "High",
     status: false,
@@ -104,7 +94,7 @@ export const mockTasks: Task[] = [
     name: "Setup CI/CD pipeline",
     description: "Configure automated testing and deployment workflows",
     date: new Date("2025-04-10"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Urgent",
     status: false,
@@ -126,7 +116,7 @@ export const mockTasks: Task[] = [
     name: "Implement error logging",
     description: "Set up comprehensive error tracking and monitoring",
     date: new Date("2025-04-15"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Medium",
     status: false,
@@ -137,7 +127,7 @@ export const mockTasks: Task[] = [
     name: "Prepare for deployment",
     description: "Finalize configuration for production environment",
     date: new Date("2025-04-18"),
-    sub_goal_id: null,
+    sub_goal_id: "",
     prayer_id: null,
     priority: "Urgent",
     status: false,

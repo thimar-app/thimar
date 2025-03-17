@@ -1,5 +1,5 @@
+import { Task } from "@/db/goals";
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { Task } from "@/context/TaskContext";
 
 export interface SubGoal {
   id: string;

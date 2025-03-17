@@ -11,6 +11,7 @@ import {
 
 import { Goal, Pentagon } from "lucide-react";
 import { HomePreferenceActions } from "@/components/pages/home/home-preference-actions";
+import { Link } from "react-router-dom";
 
 type View = "simple-list" | "prayer-list" | "board";
 
@@ -36,10 +37,12 @@ export default function GoalHeader({ title }: { title: string }) {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/goals" className="flex gap-2 items-center">
-                <Goal className="size-4" />
-                Goals
-              </BreadcrumbLink>
+              <Link to={"/goals"}>
+                <BreadcrumbPage className="text-muted-foreground hover:text-foreground transition-colors flex gap-2 items-center">
+                  <Goal className="size-4" />
+                  Goals
+                </BreadcrumbPage>
+              </Link>
             </BreadcrumbItem>
 
             <BreadcrumbSeparator />

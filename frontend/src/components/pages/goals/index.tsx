@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import GoalsHeader from "./header";
@@ -10,29 +10,28 @@ import { useGoalContext } from "@/context/GoalContext";
 export default function Goals() {
   const { goals, addGoal, calculateOverallProgress } = useGoalContext();
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get overall progress from context
     const overallProgress = calculateOverallProgress();
     setProgress(overallProgress.percentage);
   }, [goals, calculateOverallProgress]);
 
-  // Function to add an empty goal and redirect
   const handleAddGoal = () => {
     const newGoalId = uuidv4();
 
     const emptyGoal = {
       id: newGoalId,
-      name: "New Goal",
+      name: "⭐ New Goal",
       description: "Click to edit your goal description",
-      image: "https://placehold.co/500x550/1e1e1e/a1a1aa", // Default placeholder image
+      image: "https://placehold.co/500x550/1e1e1e/a1a1aa",
       progress: 0,
-      user_id: "user_123", // This would ideally come from your auth system
+      user_id: "user_123",
       subGoals: [],
     };
 
-    // Add the goal to context
     addGoal(emptyGoal);
+    navigate(`/goals/${newGoalId}`); // Redirect to new goal page
   };
 
   return (
@@ -67,7 +66,7 @@ export default function Goals() {
           <Button
             variant="ghost"
             className="gap-3 bg-card w-full cursor-pointer h-10"
-            onClick={handleAddGoal} // Added onClick handler
+            onClick={handleAddGoal} // Redirects to new goal
           >
             <CirclePlus className="!size-5" strokeWidth={1} />
             <span className="">Add Goal</span>
