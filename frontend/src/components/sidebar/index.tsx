@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/sidebar";
 
 import { ProfileActions } from "@/components/sidebar/profile-actions";
+import goals from "@/db/goals";
+
+const goalsList = goals.map((g) => {
+  return {
+    name: g.name,
+    link: g.id,
+  };
+});
 
 const data = {
   navMain: [
@@ -38,23 +46,7 @@ const data = {
     },
   ],
 
-  goals: [
-    {
-      name: "Career Objectives & Milestones",
-      url: "#",
-      emoji: "🎯",
-    },
-    {
-      name: "Skill Acquisition & Training Log",
-      url: "#",
-      emoji: "🧠",
-    },
-    {
-      name: "Networking Contacts & Events",
-      url: "#",
-      emoji: "🤝",
-    },
-  ],
+  goals: goalsList,
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
