@@ -5,6 +5,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
 
 export function NavMain({
   items,
@@ -20,12 +21,12 @@ export function NavMain({
     <SidebarMenu className="mt-2 mb-4 gap-0.5">
       {items.map((item) => (
         <SidebarMenuItem className="" key={item.title}>
-          <SidebarMenuButton asChild isActive={item.isActive}>
-            <a href={item.url}>
+          <Link to={item.url} className="w-full">
+            <SidebarMenuButton isActive={item.isActive}>
               <item.icon />
               <span>{item.title}</span>
-            </a>
-          </SidebarMenuButton>
+            </SidebarMenuButton>
+          </Link>
         </SidebarMenuItem>
       ))}
       <SidebarMenuItem className="mt-4">

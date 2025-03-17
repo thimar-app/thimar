@@ -1,12 +1,5 @@
-import React, {
-  createContext,
-  useState,
-  useContext,
-  ReactNode,
-  useEffect,
-} from "react";
+import React, { createContext, useState, useContext, ReactNode } from "react";
 import { Task } from "@/context/TaskContext";
-import { calculateGoalProgress } from "@/lib/utils";
 
 export interface SubGoal {
   id: string;
@@ -64,16 +57,6 @@ export const GoalProvider: React.FC<GoalProviderProps> = ({
   const [goals, setGoals] = useState<Goal[]>(initialGoals);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingSubGoal, setEditingSubGoal] = useState<SubGoal | null>(null);
-
-  // Update progress whenever goals or their tasks change
-  useEffect(() => {
-    const updatedGoals = goals.map((goal) => {
-      const updatedProgress = calculateGoalProgress(goal);
-
-      return { ...goal, progress: updatedProgress.percentage };
-    });
-    setGoals(updatedGoals);
-  }, [goals]);
 
   const addGoal = (goal: Goal) => {
     setGoals((prevGoals) => [...prevGoals, goal]);
