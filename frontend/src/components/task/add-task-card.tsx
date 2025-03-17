@@ -7,10 +7,13 @@ import { useTaskContext } from "@/context/TaskContext";
 import { Task } from "@/db/goals";
 
 interface AddTaskCardProps {
+  subGoalId: string;
+  todayTask?: boolean;
   onClose: () => void;
+  onSave?: () => void;
 }
 
-export function AddTaskCard({ onClose }: AddTaskCardProps) {
+export function AddTaskCard({ onClose, subGoalId = "" }: AddTaskCardProps) {
   const { addTask } = useTaskContext();
 
   const [newTask, setNewTask] = useState<Task>({
@@ -18,7 +21,7 @@ export function AddTaskCard({ onClose }: AddTaskCardProps) {
     name: "",
     description: "",
     date: new Date(),
-    sub_goal_id: "",
+    sub_goal_id: subGoalId,
     prayer_id: null,
     priority: "Low",
     status: false,

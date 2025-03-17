@@ -435,7 +435,7 @@ const PrayerListView: React.FC = () => {
                   /> */}
 
                   {showAddTaskCard ? (
-                    <AddTaskCard />
+                    <AddTaskCard subGoalId="" onClose={() => {}} />
                   ) : (
                     <Button
                       onClick={() => setShowAddTaskCard(true)}

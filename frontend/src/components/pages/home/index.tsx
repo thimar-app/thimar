@@ -67,6 +67,7 @@ export default function Home() {
             <PrayerListView />
           ) : (
             <SimpleListView
+              todayTasks
               onEditTask={handleEditTask}
               showCompletedTasks={showCompletedTasks}
             />

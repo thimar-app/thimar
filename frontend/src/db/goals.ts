@@ -27,9 +27,19 @@ export type Goal = {
   progress: number;
   user_id: string;
   subGoals: SubGoal[];
+};
+
+export type Goals = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  progress: number;
+  user_id: string;
+  subGoals: SubGoal[];
 }[];
 
-const goals: Goal = [
+const goals: Goals = [
   {
     id: "8b93e7f0-35a2-4189-9559-822f3f97fbf3",
     name: "⚡ Improve Physical Health",

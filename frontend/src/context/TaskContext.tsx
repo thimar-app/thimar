@@ -6,18 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { calculateTaskProgress } from "@/lib/utils";
-
-export interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "@/db/goals";
 
 interface TaskProgress {
   percentage: number;
