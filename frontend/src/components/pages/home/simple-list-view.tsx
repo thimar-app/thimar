@@ -7,18 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { AddTaskCard } from "@/components/task/add-task-card";
 import TaskCard from "@/components/task/task-card";
-
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "@/db/goals";
 
 interface SimpleListViewProps {
   showCompletedTasks: boolean;
@@ -84,7 +73,9 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
             )
           )}
         </ul>
-        {isAddingTask && <AddTaskCard onClose={() => setIsAddingTask(false)} />}
+        {isAddingTask && (
+          <AddTaskCard subGoalId="" onClose={() => setIsAddingTask(false)} />
+        )}
 
         <Button
           variant="ghost"

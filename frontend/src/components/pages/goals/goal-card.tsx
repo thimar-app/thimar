@@ -26,12 +26,14 @@ export default function GoalCard({ imageSrc, title, progress }: GoalCardProps) {
             <img
               src={imageSrc || "/placeholder.svg"}
               alt=""
-              className={`aspect-[5/5.5] rounded-md object-cover transition-opacity duration-300 ${
+              className={`aspect-[5/5.5] rounded-md object-cover object-center transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onLoad={() => setImageLoaded(true)}
             />
-            <h3 className="font-normal text-sm ">{shortenTitle(title)}</h3>
+            <div className="h-full flex items-center">
+              <h3 className="font-normal text-sm ">{shortenTitle(title)}</h3>
+            </div>
             <div className="w-full  flex items-center justify-center gap-2 mt-auto">
               <div className="w-full h-3 rounded-full bg-muted-foreground/30">
                 <div

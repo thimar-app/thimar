@@ -76,7 +76,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Goal as GoalIcon } from "lucide-react";
+
+import { Goal, Pentagon } from "lucide-react";
+import { HomePreferenceActions } from "@/components/pages/home/home-preference-actions";
+import { Link } from "react-router-dom";
+
+type View = "simple-list" | "prayer-list" | "board";
+
+type HomeHeader = {
+  view: View;
+  setView: React.Dispatch<React.SetStateAction<View>>;
+  showPrayerSection: boolean;
+  showCompletedTasks: boolean;
+  setShowPrayerSection: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowCompletedTasks: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 export default function GoalHeader({ title }: { title: string }) {
   const { state } = useSidebar();
@@ -90,13 +104,12 @@ export default function GoalHeader({ title }: { title: string }) {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink
-                href="/goals"
-                className="flex gap-2 items-center"
-              >
-                <GoalIcon className="w-4 h-4" />
-                Goals
-              </BreadcrumbLink>
+              <Link to={"/goals"}>
+                <BreadcrumbPage className="text-muted-foreground hover:text-foreground transition-colors flex gap-2 items-center">
+                  <Goal className="size-4" />
+                  Goals
+                </BreadcrumbPage>
+              </Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

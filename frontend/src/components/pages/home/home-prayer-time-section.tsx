@@ -45,9 +45,9 @@ export default function HomePrayerTimeSection() {
             <span className="text-3xl">1h 12min</span>
           </div>
 
-          <span className="absolute text-xs text-white -right-3 bg-violet-600 size-8 rounded-full flex items-center justify-center">
+          {/* <span className="absolute text-xs text-white -right-3 bg-violet-600 size-8 rounded-full flex items-center justify-center">
             Fajr
-          </span>
+          </span> */}
         </div>
       </div>
     </section>

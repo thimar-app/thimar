@@ -1,3 +1,4 @@
+import { Task } from "@/db/goals";
 // import React, { createContext, useState, useContext, ReactNode } from "react";
 // import { Task } from "@/context/TaskContext";
 // import { fetchGoalsApi, addGoalApi, updateGoalApi, deleteGoalApi } from "@/services/api";
