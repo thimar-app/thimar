@@ -17,6 +17,7 @@ import {
   Edit,
   Save,
   X,
+  PenLine,
 } from "lucide-react";
 import { SubGoal, Task } from "@/db/goals";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,6 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
   const { moveSubGoal, updateSubGoal } = useGoalContext();
   const {
     tasks,
-    addTask,
     toggleTaskStatus,
     deleteTask,
     updateTask,
@@ -63,11 +63,6 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
     const updatedSubGoal = { ...subGoal, name: subGoalTitle };
     updateSubGoal(updatedSubGoal);
     setIsEditingTitle(false);
-  };
-
-  const handleTaskAdded = (task: Task) => {
-    addTask(task);
-    setIsAddingTask(false);
   };
 
   const handleEditTask = (task: Task) => {
@@ -103,7 +98,7 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
 
   const [, dropTask] = useDrop({
     accept: ItemTypes.TASK,
-    drop(item: { id: string; subGoalId: string }, monitor) {
+    drop(item: { id: string; subGoalId: string }) {
       const task = tasks.find((t) => t.id === item.id);
       if (!task || task.sub_goal_id === subGoal.id) return;
       const updatedTask = { ...task, sub_goal_id: subGoal.id };
@@ -116,45 +111,51 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
   return (
     <div
       ref={ref}
-      className={`mb-2 rounded-lg ${isDragging ? "opacity-50" : ""}`}
+      className={`mb-2  rounded-lg ${isDragging ? "opacity-50" : ""}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex items-center p-2 bg-muted/30">
-          <div className="mr-2 cursor-move">
-            <GripVertical className="text-muted-foreground" size={18} />
-          </div>
+        <div className="flex relative items-center rounded-lg group/coll hover:bg-card p-2 bg-muted/30">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="hover:bg-neutral-200 py-1 rounded absolute cursor-move group-hover/coll:block hidden -left-2 h-6 w-min text-muted-foreground"
+          >
+            <GripVertical className="h-4 w-4" />
+          </Button>
           {isEditingTitle ? (
-            <div className="flex items-center flex-1 gap-2">
+            <div className="flex items-center flex-1 gap-4">
               <Input
                 value={subGoalTitle}
                 onChange={(e) => setSubGoalTitle(e.target.value)}
                 className="h-8"
                 autoFocus
               />
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleSaveTitle}
-                className="p-1 h-8 w-8"
-              >
-                <Save size={16} />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  setSubGoalTitle(subGoal.name);
-                  setIsEditingTitle(false);
-                }}
-                className="p-1 h-8 w-8"
-              >
-                <X size={16} />
-              </Button>
+              <div className="flex gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleSaveTitle}
+                  className="size-6 text-muted-foreground"
+                >
+                  <Save size={16} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    setSubGoalTitle(subGoal.name);
+                    setIsEditingTitle(false);
+                  }}
+                  className="size-6 text-muted-foreground"
+                >
+                  <X />
+                </Button>
+              </div>
             </div>
           ) : (
             <>
-              <CollapsibleTrigger className="flex items-center flex-1">
+              <CollapsibleTrigger className="cursor-pointer flex items-center flex-1">
                 {isOpen ? (
                   <ChevronDown className="mr-2 h-4 w-4" />
                 ) : (
@@ -166,21 +167,21 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
                 </span>
               </CollapsibleTrigger>
               <Button
+                size="icon"
                 variant="ghost"
-                size="sm"
+                className="group-hover/coll:flex hidden size-6 text-muted-foreground"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditingTitle(true);
                 }}
-                className="p-1 h-8 w-8"
               >
-                <Edit size={16} />
+                <PenLine className="h-4 w-4" />
               </Button>
             </>
           )}
         </div>
-        <CollapsibleContent>
-          <div className="p-2">
+        <CollapsibleContent className="ml-3.5">
+          <div className="p-2 pt-0 pl-4 border-l-2 ">
             <ul className="divide-y">
               {filteredTasks.map((task, taskIndex) => (
                 <TaskCardDraggable

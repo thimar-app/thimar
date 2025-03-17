@@ -8,6 +8,7 @@ import { Task } from "@/db/goals";
 
 interface AddTaskCardProps {
   subGoalId: string;
+  todayTask?: boolean;
   onClose: () => void;
   onSave?: () => void;
 }
