@@ -17,6 +17,7 @@ pillow = ">=10.4.0"
 celery = "*"
 praytimes = "*"
 gunicorn = "*"
+cloudinary = "*"
 
 [dev-packages]
 
