@@ -41,7 +41,7 @@ DEBUG = True
 
 # ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS = ['thimar.onrender.com']
+ALLOWED_HOSTS = ['thimar.onrender.com','127.0.0.1','localhost']
 
 # Application definition
 
