@@ -5,9 +5,9 @@ import {
   Droplets,
   Waves,
   Coffee,
-  Wind,
   Flame,
   MoonStar,
+  Dam,
 } from "lucide-react";
 
 const sounds = [
@@ -27,9 +27,9 @@ const sounds = [
     name: "Thunder",
   },
   {
-    Icon: Droplets,
-    src: "/audios/drops.mp3",
-    name: "Drops",
+    Icon: Dam,
+    src: "/audios/waterfall.mp3",
+    name: "Waterfall",
   },
   {
     Icon: Waves,
@@ -48,7 +48,7 @@ const sounds = [
   },
   {
     Icon: MoonStar,
-    src: "/audios/night2.mp3",
+    src: "/audios/night.mp3",
     name: "Night",
   },
 ];

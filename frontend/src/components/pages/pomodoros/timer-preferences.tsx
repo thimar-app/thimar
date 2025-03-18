@@ -75,18 +75,20 @@ export function TimerPreferences({
   };
 
   return (
-    <div className="flex flex-col gap-4 max-h-[calc(100vh-100px)]">
+    <div className="flex flex-col gap-4">
       <div className="space-y-4">
         <h3 className="text-lg">Set Pomodoro Time</h3>
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={pomodoroInput}
             onChange={(e) => handlePomodoroChange(e.target.value)}
-            className="bg-[#333333] border-none text-white"
+            className="!bg-card border-none"
             min="1"
           />
-          <span className="text-gray-400">minutes</span>
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+            minutes
+          </span>
         </div>
 
         <div className="grid grid-cols-4 gap-2">
@@ -95,9 +97,9 @@ export function TimerPreferences({
               key={option}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444] text-white h-10 text-xl",
+                "bg-[#333333] hover:bg-[#444444] h-10 text-xl",
                 settings.pomodoro === option &&
-                  "bg-[#7c3aed] hover:bg-[#6d28d9]"
+                  "bg-primary hover:!bg-primary/80"
               )}
               onClick={() => selectPomodoroOption(option)}
             >
@@ -109,15 +111,17 @@ export function TimerPreferences({
 
       <div className="space-y-4">
         <h3 className="text-lg">Set Short Break</h3>
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={shortBreakInput}
             onChange={(e) => handleShortBreakChange(e.target.value)}
-            className="bg-[#333333] border-none text-white"
+            className="!bg-card border-none"
             min="1"
           />
-          <span className="text-gray-400">minutes</span>
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+            minutes
+          </span>
         </div>
 
         <div className="grid grid-cols-4 gap-2">
@@ -128,7 +132,7 @@ export function TimerPreferences({
               className={cn(
                 "bg-[#333333] hover:bg-[#444444] text-white h-10 text-xl",
                 settings.shortBreak === option &&
-                  "bg-[#7c3aed] hover:bg-[#6d28d9]"
+                  "bg-primary hover:!bg-primary/80"
               )}
               onClick={() => selectShortBreakOption(option)}
             >
@@ -140,15 +144,17 @@ export function TimerPreferences({
 
       <div className="space-y-4">
         <h3 className="text-lg">Set Long Break</h3>
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={longBreakInput}
             onChange={(e) => handleLongBreakChange(e.target.value)}
-            className="bg-[#333333] border-none text-white"
+            className="!bg-card border-none"
             min="1"
           />
-          <span className="text-gray-400">minutes</span>
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+            minutes
+          </span>
         </div>
 
         <div className="grid grid-cols-4 gap-2">
@@ -157,9 +163,9 @@ export function TimerPreferences({
               key={option}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444] text-white h-10 text-xl",
+                "bg-[#333333] hover:bg-[#444444]  h-10 text-xl",
                 settings.longBreak === option &&
-                  "bg-[#7c3aed] hover:bg-[#6d28d9]"
+                  "bg-primary hover:!bg-primary/80"
               )}
               onClick={() => selectLongBreakOption(option)}
             >

@@ -37,12 +37,12 @@ export function PomodoroTimer() {
     shortBreak: 5,
     longBreak: 15,
     soundEnabled: true,
-    volume: 50,
-    activeSounds: ["Birds", "Rain"],
+    volume: 40,
+    activeSounds: ["Birds", "Waterfall"],
     playDuringBreaks: false,
     quranReciter: "https://server6.mp3quran.net/qtm",
     quranSurah: "002",
-    quranVolume: 50,
+    quranVolume: 80,
     playNextSurah: false, // Add this new setting with default value
   });
 
@@ -305,23 +305,23 @@ export function PomodoroTimer() {
     }
   };
 
-  const resetTimer = () => {
-    let initialTime = 0;
-    switch (timerState) {
-      case "pomodoro":
-        initialTime = settings.pomodoro * 60;
-        break;
-      case "shortBreak":
-        initialTime = settings.shortBreak * 60;
-        break;
-      case "longBreak":
-        initialTime = settings.longBreak * 60;
-        break;
-    }
-    setTimeLeft(initialTime);
-    totalTimeRef.current = initialTime;
-    setTimerStatus("idle");
-  };
+  // const resetTimer = () => {
+  //   let initialTime = 0;
+  //   switch (timerState) {
+  //     case "pomodoro":
+  //       initialTime = settings.pomodoro * 60;
+  //       break;
+  //     case "shortBreak":
+  //       initialTime = settings.shortBreak * 60;
+  //       break;
+  //     case "longBreak":
+  //       initialTime = settings.longBreak * 60;
+  //       break;
+  //   }
+  //   setTimeLeft(initialTime);
+  //   totalTimeRef.current = initialTime;
+  //   setTimerStatus("idle");
+  // };
 
   const moveToNextState = () => {
     if (timerState === "pomodoro") {
@@ -471,14 +471,14 @@ export function PomodoroTimer() {
   const circumference = 2 * Math.PI * 120; // Circle radius is 120px
 
   return (
-    <div className="flex w-full max-w-4xl">
+    <div className="flex w-full h-full justify-center items-center">
       <div
         className={cn(
           "flex flex-1 flex-col items-center justify-center p-8 transition-all duration-300",
           showPreferences || showSoundPreferences ? "w-1/2" : "w-full"
         )}
       >
-        <div className="text-lg font-medium text-gray-400 mb-2">
+        <div className="text-lg font-medium text-muted-foreground mb-2">
           {getStateLabel()}{" "}
           {timerState === "pomodoro" && `(${(pomodoroCount % 4) + 1}/4)`}
         </div>
@@ -517,8 +517,10 @@ export function PomodoroTimer() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-6xl font-bold">{formatTime(timeLeft)}</span>
-            <span className="text-gray-400 mt-2">
+            <span className="text-6xl p-2 rounded-lg hover:bg-card font-semibold">
+              {formatTime(timeLeft)}
+            </span>
+            <span className="text-muted-foreground mt-2">
               {timerStatus === "running"
                 ? "running"
                 : timerStatus === "completed"
@@ -530,7 +532,7 @@ export function PomodoroTimer() {
 
         <div className="flex gap-2">
           <Button
-            className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-8 py-2 rounded-md"
+            className="bg-[#7c3aed] hover:bg-[#6d28d9] px-8 py-2 rounded-md"
             onClick={toggleTimer}
           >
             {getButtonLabel()}
@@ -538,7 +540,7 @@ export function PomodoroTimer() {
 
           {timerStatus === "paused" && (
             <Button
-              className="bg-[#333333] hover:bg-[#444444] text-white px-6 py-2 rounded-md"
+              className="bg-[#333333] hover:bg-[#444444] px-6 py-2 rounded-md"
               onClick={moveToNextState}
             >
               Skip
@@ -562,7 +564,7 @@ export function PomodoroTimer() {
       </div>
 
       {showPreferences && (
-        <div className="w-1/2 bg-transparent border-l border-[#333333] px-6 overflow-auto">
+        <div className="w-1/2 max-w-md bg-transparent border-l border-[#333333] px-6 overflow-auto">
           <TimerPreferences
             settings={settings}
             updateSettings={updateSettings}
@@ -571,20 +573,15 @@ export function PomodoroTimer() {
       )}
 
       {showSoundPreferences && (
-        <div className="w-1/2 relative bg-[#1e1e1e] border-l border-[#333333]">
-          <h2 className="absolute left-6 -top-6 text-xl font-semibold">
-            Sounds Preferences
-          </h2>
-          <div className="overflow-auto px-6">
-            <SoundPreferences
-              settings={settings}
-              updateSettings={updateSettings}
-              shouldPlaySounds={shouldPlayAmbientSounds()}
-              shouldPlayQuran={shouldPlayQuran()}
-              timerState={timerState}
-              timerStatus={timerStatus}
-            />
-          </div>
+        <div className="w-1/2 max-w-md bg-transparent border-l border-[#333333] overflow-auto px-6">
+          <SoundPreferences
+            settings={settings}
+            updateSettings={updateSettings}
+            shouldPlaySounds={shouldPlayAmbientSounds()}
+            shouldPlayQuran={shouldPlayQuran()}
+            timerState={timerState}
+            timerStatus={timerStatus}
+          />
         </div>
       )}
     </div>

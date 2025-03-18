@@ -44,10 +44,6 @@ interface SoundPreferencesProps {
 export function SoundPreferences({
   settings,
   updateSettings,
-  shouldPlaySounds,
-  shouldPlayQuran,
-  timerState,
-  timerStatus,
 }: SoundPreferencesProps) {
   const [volume, setVolume] = useState(settings.volume);
   const [quranVolume, setQuranVolume] = useState(settings.quranVolume);
@@ -83,7 +79,7 @@ export function SoundPreferences({
       activeSounds: newActiveSounds,
       soundEnabled:
         newActiveSounds.length > 0 ||
-        (settings.quranReciter && settings.quranSurah) ||
+        (!!settings.quranReciter && !!settings.quranSurah) ||
         settings.soundEnabled,
     });
   };
@@ -131,7 +127,7 @@ export function SoundPreferences({
   );
 
   return (
-    <div className="flex flex-col gap-4 max-h-[calc(100vh-100px)] pt-4">
+    <div className="flex flex-col gap-4 h-full">
       {/* Quran Audio Section */}
       <div className="space-y-4 border-b border-[#333333] pb-6">
         <div className="flex items-center gap-4">
