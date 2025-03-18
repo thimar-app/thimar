@@ -5,13 +5,11 @@ import {
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import { Goal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Clock9 } from "lucide-react";
 
-export default function GoalHeader({ title }: { title: string }) {
+export default function PomodoroHeader() {
   const { state } = useSidebar();
   return (
     <header className="flex h-14 shrink-0 items-center gap-2">
@@ -20,20 +18,13 @@ export default function GoalHeader({ title }: { title: string }) {
         {state === "collapsed" && (
           <Separator orientation="vertical" className="mr-2 h-4" />
         )}
+
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <Link to={"/goals"}>
-                <BreadcrumbPage className="text-muted-foreground hover:text-foreground transition-colors flex gap-2 items-center">
-                  <Goal className="size-4" />
-                  Goals
-                </BreadcrumbPage>
-              </Link>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
               <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
-                {title}
+                <Clock9 className="size-4" />
+                Pomodoro
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
