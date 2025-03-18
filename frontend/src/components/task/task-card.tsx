@@ -15,18 +15,7 @@ import {
 
 import { useDrag, useDrop } from "react-dnd";
 import React, { useState } from "react";
-
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "@/db/goals";
 
 interface TaskItemProps {
   task: Task;
@@ -55,13 +44,15 @@ const ItemTypes = {
   TASK: "task",
 };
 
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("en-US", {
+const formatDate = (date: Date | string): string => {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  return dateObj.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 };
+
 
 const priorityVariantMap = {
   Low: "outline",

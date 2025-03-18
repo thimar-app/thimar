@@ -1,11 +1,13 @@
 import { CirclePlus, type LucideIcon } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGoalContext } from "@/context/GoalContext";
 
 export function NavMain({
   items,
@@ -17,6 +19,25 @@ export function NavMain({
     isActive?: boolean;
   }[];
 }) {
+  const { addGoal } = useGoalContext();
+  const navigate = useNavigate();
+
+  const handleAddGoal = () => {
+    const newGoalId = uuidv4();
+
+    const emptyGoal = {
+      id: newGoalId,
+      name: "⭐ New Goal",
+      description: "Click to edit your goal description",
+      image: "https://placehold.co/500x550/1e1e1e/a1a1aa",
+      progress: 0,
+      user_id: "user_123",
+      subGoals: [],
+    };
+
+    addGoal(emptyGoal);
+    navigate(`/goals/${newGoalId}`);
+  };
   return (
     <SidebarMenu className="mt-2 mb-4 gap-0.5">
       {items.map((item) => (
@@ -30,7 +51,10 @@ export function NavMain({
         </SidebarMenuItem>
       ))}
       <SidebarMenuItem className="mt-4">
-        <SidebarMenuButton className="text-foreground bg-sidebar-accent hover:bg-sidebar-primary cursor-pointer justify-center border border-dashed">
+        <SidebarMenuButton
+          onClick={handleAddGoal}
+          className="text-foreground bg-sidebar-accent hover:bg-sidebar-primary cursor-pointer justify-center border border-dashed"
+        >
           <CirclePlus strokeWidth={1.5} />
           <span>Add Goal</span>
         </SidebarMenuButton>
