@@ -242,6 +242,7 @@ import {
   Edit,
   Save,
   X,
+  PenLine,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ItemTypes } from "./item-types";
@@ -386,21 +387,21 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
                 </span>
               </CollapsibleTrigger>
               <Button
+                size="icon"
                 variant="ghost"
-                size="sm"
+                className="group-hover/coll:flex hidden size-6 text-muted-foreground"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditingTitle(true);
                 }}
-                className="p-1 h-8 w-8"
               >
-                <Edit size={16} />
+                <PenLine className="h-4 w-4" />
               </Button>
             </>
           )}
         </div>
-        <CollapsibleContent>
-          <div className="p-2">
+        <CollapsibleContent className="ml-3.5">
+          <div className="p-2 pt-0 pl-4 border-l-2 ">
             <ul className="divide-y">
               {filteredTasks.map((task, taskIndex) => (
                 <TaskCardDraggable
@@ -430,7 +431,7 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
               className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
               onClick={() => setIsAddingTask(true)}
             >
-              <CirclePlus size={18} strokeWidth={1} />
+              <CirclePlus className="size-5" strokeWidth={1} />
               Add Task
             </Button>
           </div>

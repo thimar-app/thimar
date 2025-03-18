@@ -131,11 +131,11 @@ import { Separator } from "@radix-ui/react-separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbPage,
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Goal as GoalIcon } from "lucide-react";
+
+import { Goal } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function GoalHeader({ title }: { title: string }) {
@@ -152,7 +152,7 @@ export default function GoalHeader({ title }: { title: string }) {
             <BreadcrumbItem>
               <Link to={"/goals"}>
                 <BreadcrumbPage className="text-muted-foreground hover:text-foreground transition-colors flex gap-2 items-center">
-                  <GoalIcon className="size-4" />
+                  <Goal className="size-4" />
                   Goals
                 </BreadcrumbPage>
               </Link>

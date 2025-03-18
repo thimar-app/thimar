@@ -248,6 +248,7 @@ import {
   deleteSubGoalApi,
 } from "@/services/api";
 
+// Interfaces matching your backend:
 export interface SubGoal {
   id: string;
   name: string;

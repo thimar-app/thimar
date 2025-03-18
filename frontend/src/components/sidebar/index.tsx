@@ -22,6 +22,16 @@ import { useEffect } from "react";
 //     link: g.id,
 //   };
 // });
+// import goals from "@/db/goals";
+import { GoalProvider, useGoalContext } from "@/context/GoalContext";
+import { useEffect } from "react";
+
+// const goalsList = goals.map((g) => {
+//   return {
+//     name: g.name,
+//     link: g.id,
+//   };
+// });
 
 const data = {
   navMain: [
@@ -42,8 +52,8 @@ const data = {
       icon: CircleCheckBig,
     },
     {
-      title: "Pomodoros",
-      url: "pomodoros",
+      title: "Pomodoro",
+      url: "pomodoro",
       icon: Clock9,
     },
   ],
@@ -65,19 +75,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <GoalProvider>
-    <Sidebar className="border-r-0" {...props}>
-      <SidebarHeader>
-        <div className="flex justify-between gap-2 items-center mt-1.5">
-          <ProfileActions />
-          <SidebarTrigger />
-        </div>
-        <NavMain items={data.navMain} />
-      </SidebarHeader>
-      <SidebarContent>  
-        <NavGoals goals={goalsList} showMore={false} />
-      </SidebarContent>
-      <SidebarRail />
-    </Sidebar>
+      <Sidebar className="border-r-0" {...props}>
+        <SidebarHeader>
+          <div className="flex justify-between gap-2 items-center mt-1.5">
+            <ProfileActions />
+            <SidebarTrigger />
+          </div>
+          <NavMain items={data.navMain} />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavGoals goals={goalsList} />
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
     </GoalProvider>
   );
 }
