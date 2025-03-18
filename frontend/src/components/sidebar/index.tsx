@@ -23,8 +23,6 @@ import { useEffect } from "react";
 //   };
 // });
 // import goals from "@/db/goals";
-import { GoalProvider, useGoalContext } from "@/context/GoalContext";
-import { useEffect } from "react";
 
 // const goalsList = goals.map((g) => {
 //   return {
@@ -84,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain items={data.navMain} />
         </SidebarHeader>
         <SidebarContent>
-          <NavGoals goals={goalsList} />
+          <NavGoals goals={goalsList} showMore={false} />
         </SidebarContent>
         <SidebarRail />
       </Sidebar>

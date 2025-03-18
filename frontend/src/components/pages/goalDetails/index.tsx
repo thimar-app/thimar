@@ -57,7 +57,7 @@
 // }
 
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import GoalHeader from "./header";
 import { ImageUp, Sparkles } from "lucide-react";

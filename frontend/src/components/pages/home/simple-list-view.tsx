@@ -8,7 +8,6 @@ import { CirclePlus } from "lucide-react";
 import { AddTaskCard } from "@/components/task/add-task-card";
 import TaskCard from "@/components/task/task-card";
 import { Task } from "@/db/goals";
-import { Task } from "@/db/goals";
 
 interface SimpleListViewProps {
   showCompletedTasks: boolean;
