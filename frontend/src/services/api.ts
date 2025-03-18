@@ -2,7 +2,7 @@
 // import axios from "axios";
 
 // // const API_BASE_URL = "https://thimar.onrender.com/api";
-// const API_BASE_URL = "http://127.0.0.1:8000/api";
+// const API_BASE_URL = "https://thimar.onrender.com/api";
 
 // // Helper to get token (you may replace this with your auth logic)
 // const getAuthHeader = () => {
@@ -42,7 +42,7 @@
 
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "https://thimar.onrender.com/api";
 
 // Helper to get token (adjust per your auth implementation)
 const getAuthHeader = () => {
