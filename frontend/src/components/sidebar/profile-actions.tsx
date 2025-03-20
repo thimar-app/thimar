@@ -79,7 +79,7 @@ export function ProfileActions() {
             <AvatarFallback>NZ</AvatarFallback>
           </Avatar>
 
-          <span className="font-medium">Username</span>
+          <span className="font-medium">Nzar</span>
           <ChevronDown />
         </Button>
       </PopoverTrigger>

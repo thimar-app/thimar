@@ -13,7 +13,7 @@ class Goal(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     # image = models.ImageField(upload_to="goals/images/", blank=True, null=True)
-    image = CloudinaryField('image') 
+    image = CloudinaryField('image', blank=True, null=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

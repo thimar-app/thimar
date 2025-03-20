@@ -24,7 +24,7 @@ export const addTaskApi = async (task: Task): Promise<Task> => {
 };
 
 export const updateTaskApi = async (task: Task): Promise<Task> => {
-  const response = await axios.put(`${API_BASE_URL}/tasks/${task.id}/`, task, {
+  const response = await axios.patch(`${API_BASE_URL}/tasks/${task.id}/`, task, {
     headers: getAuthHeader(),
   });
   return response.data;
@@ -34,4 +34,14 @@ export const deleteTaskApi = async (taskId: string): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/tasks/${taskId}/`, {
     headers: getAuthHeader(),
   });
+  
 };
+
+export const createTask = async (task: any) => {
+  const response = await axios.post(`${API_BASE_URL}/tasks/`, task, {
+    headers: getAuthHeader(),
+  });
+  console.log(response.data);
+  return response.data;
+};
+

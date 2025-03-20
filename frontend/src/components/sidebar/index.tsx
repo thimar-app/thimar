@@ -20,9 +20,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { goals, fetchGoals } = useGoalContext();
   const location = useLocation();
 
-  useEffect(() => {
-    fetchGoals();
-  }, []);
+  // useEffect(() => {
+  //   fetchGoals();
+  // }, []);
 
   const goalsList = goals.map((g) => ({
     name: g.name,
@@ -56,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   return (
-    <GoalProvider>
+    // <GoalProvider>
       <Sidebar className="border-r-0" {...props}>
         <SidebarHeader>
           <div className="flex justify-between gap-2 items-center mt-1.5">
@@ -70,6 +70,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarContent>
         <SidebarRail />
       </Sidebar>
-    </GoalProvider>
+    // </GoalProvider>
   );
 }
