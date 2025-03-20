@@ -6,5 +6,6 @@ urlpatterns = [
     # path('generate-task/', GenerateTaskView.as_view(), name='generate-task'),
     path('new-goal/', GenerateGoalView.as_view(), name='new-goal-mistral'),
     path('new-task/', GenerateTaskView.as_view(), name='new-goal-mistral'),
+    path('generate-baraqah/', GenerateBaraqah.as_view(), name='baraqah-mistral'),
 
 ]

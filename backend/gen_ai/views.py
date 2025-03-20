@@ -3,6 +3,7 @@ from mistralai import Mistral
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from datetime import datetime
 
 from thimar_project import settings
 
@@ -44,11 +45,13 @@ class GenerateGoalView(APIView):
         system_message = {
             "role": "system",
             "content": (
-                "You are a helpful AI creating a concise, faith-centered goal for a user, with a brief (1 sentence) explanation inspired by Islamic principles like ihsan (excellence) and wasatiyyah (balance). "
-                "Align the new goal with the user’s existing goals, descriptions, and progress, fostering both worldly productivity and spiritual growth. "
-                "Provide the goal and the one-sentence explanation clearly."
+                "You are a helpful AI creating a concise, faith-centered goal for the user. "
+                "Provide a single-sentence explanation inspired by Islamic principles such as ihsan (excellence) and wasatiyyah (balance). "
+                "Align this new goal with the user’s existing goals, fostering both worldly productivity and spiritual growth. "
+                "Clearly present the goal and the single-sentence explanation."
             )
         }
+
         user_message = {
             "role": "user",
             "content": self._build_prompt(existing_goals)
@@ -156,15 +159,16 @@ class GenerateTaskView(APIView):
             "role": "system",
             "content": (
                 "You are a helpful AI creating a new task. "
-                "Return exactly 4 lines:\n"
+                "Respond with exactly 4 lines:\n"
                 "TASK NAME: <Short title>\n"
                 "DESCRIPTION: <Up to 5 words>\n"
                 "PRIORITY: Low/Medium/High/Urgent\n"
                 "REPEAT: Yes/No\n\n"
-                "Consider the user's existing completed tasks and their current goal. "
-                "Lean on productivity and, if relevant, an Islamic perspective (brief)."
+                "Focus on the user’s productivity. Consider their completed tasks, current goal, "
+                "and, if relevant, include a brief Islamic perspective."
             )
         }
+
         user_message = {
             "role": "user",
             "content": self._build_prompt(completed_tasks, goal_name, goal_description)
@@ -228,3 +232,149 @@ Remember the format must be 4 lines:
 3) PRIORITY (Low/Medium/High/Urgent)
 4) REPEAT (Yes/No)
 """
+
+
+class GenerateBaraqah(APIView):
+    """
+    Generates a new task (name, up to 5-word description, priority, repeat yes/no)
+    using Mistral's chat completion, factoring in:
+      - Completed tasks
+      - The current goal
+      - The current day or special occasions like Ramadan
+    """
+    permission_classes = [permissions.IsAuthenticated]  # Or AllowAny if desired
+
+    def post(self, request, *args, **kwargs):
+        # 1) Retrieve Mistral API key
+        mistral_api_key = os.getenv("MISTRAL_API_KEY")
+        if not mistral_api_key:
+            return Response(
+                {"error": "MISTRAL_API_KEY not found in environment."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        # 2) Parse user input from request body
+        # Example JSON:
+        # {
+        #   "completed_tasks": ["Read 2 chapters", "Wrote summary", "Prayed Fajr on time"],
+        #   "goal_name": "Improve Reading Speed",
+        #   "goal_description": "Focus on finishing books efficiently"
+        # }
+        completed_tasks = request.data.get("completed_tasks", [])
+        goal_name = request.data.get("goal_name", "")
+        goal_description = request.data.get("goal_description", "")
+
+        # Validate
+        if not goal_name or not goal_description:
+            return Response(
+                {"error": "Missing 'goal_name' or 'goal_description'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 3) Initialize Mistral client
+        client = Mistral(api_key=mistral_api_key)
+
+        # 4) Build the chat messages
+        #    We'll pass along any relevant day- or occasion-based info to the system prompt.
+        system_message = {
+            "role": "system",
+            "content": (
+                "You are a helpful AI creating a new task. "
+                "Respond with exactly 4 lines:\n"
+                "TASK NAME: <Short title>\n"
+                "DESCRIPTION: <Up to 5 words>\n"
+                "PRIORITY: Low/Medium/High/Urgent\n"
+                "REPEAT: Yes/No\n\n"
+                "Focus on the user’s productivity, but also consider "
+                "today's context (e.g., if it's Friday or Ramadan) and a brief Islamic perspective if relevant."
+            )
+        }
+
+        user_message = {
+            "role": "user",
+            "content": self._build_prompt(completed_tasks, goal_name, goal_description)
+        }
+
+        messages = [system_message, user_message]
+
+        # 5) Call the Mistral chat completion
+        try:
+            response = client.chat.complete(
+                model="mistral-large-latest",  # or the appropriate model
+                messages=messages,
+                max_tokens=120,
+                temperature=0.7,
+            )
+            ai_text = response.choices[0].message.content.strip()
+
+            # 6) Parse AI text
+            lines = ai_text.split("\n")
+            new_task = {}
+            for line in lines:
+                line = line.strip()
+                if line.startswith("TASK NAME:"):
+                    new_task["name"] = line.replace("TASK NAME:", "").strip()
+                elif line.startswith("DESCRIPTION:"):
+                    new_task["description"] = line.replace("DESCRIPTION:", "").strip()
+                elif line.startswith("PRIORITY:"):
+                    new_task["priority"] = line.replace("PRIORITY:", "").strip()
+                elif line.startswith("REPEAT:"):
+                    new_task["repeat"] = line.replace("REPEAT:", "").strip()
+
+            if not new_task:
+                # Optionally handle scenario where AI didn't follow the format
+                return Response(
+                    {"error": "AI output did not match the expected format.", "raw": ai_text},
+                    status=status.HTTP_200_OK
+                )
+
+            return Response(new_task, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _build_prompt(self, completed_tasks, goal_name, goal_description):
+        """
+        Create a user message summarizing the completed tasks, current goal,
+        and any date/occasion info (e.g., if it’s Friday or Ramadan).
+        """
+        # Identify special day or occasion
+        day_of_week = datetime.now().strftime("%A")  # e.g., 'Monday', 'Tuesday', etc.
+        
+        # This is a placeholder to decide if it's Ramadan.
+        # In production, you might integrate an Islamic calendar check 
+        # or allow the user to specify "is_ramadan" in their request.
+        is_ramadan = False  # Set True if your logic says it's Ramadan
+
+        # Build a short note about day/occasion
+        date_context = []
+        if day_of_week == "Friday":
+            # Example from the prompt: "if it's Friday, read Surah Al-Baqarah"
+            date_context.append("It's Friday, consider reading Surah Al-Baqarah.")
+        if is_ramadan:
+            date_context.append("It is Ramadan, consider praying Tarawih.")
+
+        # Join the date context into a single string
+        if date_context:
+            date_context_str = " ".join(date_context)
+        else:
+            date_context_str = f"Today is {day_of_week}, no special occasion detected."
+
+        # Summarize user tasks
+        tasks_list_str = "\n".join(f"- {task}" for task in completed_tasks)
+
+        # Compose final user prompt
+        return (
+            f"User has the following completed tasks:\n"
+            f"{tasks_list_str}\n\n"
+            f"Current Goal:\n"
+            f"Name: {goal_name}\n"
+            f"Description: {goal_description}\n\n"
+            f"Date context: {date_context_str}\n\n"
+            f"Generate one new, concise task aligned with the current goal. "
+            f"Remember the format must be 4 lines:\n"
+            f"1) TASK NAME (short)\n"
+            f"2) DESCRIPTION (5 words max)\n"
+            f"3) PRIORITY (Low/Medium/High/Urgent)\n"
+            f"4) REPEAT (Yes/No)"
+        )
