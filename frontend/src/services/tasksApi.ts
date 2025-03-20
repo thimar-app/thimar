@@ -37,11 +37,14 @@ export const deleteTaskApi = async (taskId: string): Promise<void> => {
   
 };
 
-export const createTask = async (task: any) => {
-  const response = await axios.post(`${API_BASE_URL}/tasks/`, task, {
-    headers: getAuthHeader(),
+export async function createTask(taskData: any) {
+  // e.g. POST /tasks/
+  const response = await axios.post(`${API_BASE_URL}/tasks/`, taskData, {
+    headers: {
+      ...getAuthHeader(),
+      "Content-Type": "application/json",
+    },
   });
-  console.log(response.data);
-  return response.data;
-};
+  return response.data; // The created task object
+}
 

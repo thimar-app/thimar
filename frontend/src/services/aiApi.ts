@@ -47,3 +47,16 @@ export async function generateNewTaskFromAI(payload: any) {
   );
   return response.data; // Typically { output: "...some AI text..." }
 }
+
+export async function generateDouaaAdvice() {
+  const response = await axios.get(
+    `${API_BASE_URL}/gen-ai/generate-baraqah/`,
+    {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data; // Typically { text: "... some advice/douaa ..." }
+}
