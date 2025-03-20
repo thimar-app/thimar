@@ -239,7 +239,7 @@ class GenerateBaraqah(APIView):
     Returns a text message containing a douaa or nasi7a (advice) based on the current day or month.
     """
     # Set permissions as needed, e.g., AllowAny for public access
-    permission_classes = []
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         now = datetime.now()
