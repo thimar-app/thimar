@@ -18,6 +18,8 @@ celery = "*"
 praytimes = "*"
 gunicorn = "*"
 cloudinary = "*"
+openai = "==0.28"
+mistralai = "*"
 
 [dev-packages]
 
