@@ -36,10 +36,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 # DEBUG = env('DEBUG')
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
-# ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['thimar.onrender.com','127.0.0.1','localhost']
 
