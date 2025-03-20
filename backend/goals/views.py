@@ -1,8 +1,14 @@
+
+from rest_framework.response import Response
+from rest_framework import permissions, status
+from rest_framework.views import APIView
+from django.conf import settings
 from rest_framework import generics, permissions
 from .models import Goal
 from .serializers import GoalSerializer
 from .models import SubGoal
 from .serializers import SubGoalSerializer
+import cloudinary.uploader
 
 class GoalListCreateView(generics.ListCreateAPIView):
     serializer_class = GoalSerializer
@@ -20,9 +26,6 @@ class GoalDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Goal.objects.filter(user=self.request.user)
-
-
-
 
 # sub-goals/views.py
 

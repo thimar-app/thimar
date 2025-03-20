@@ -21,6 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/users/', include('users.urls')),
     path('api/goals/', include('goals.urls')),
+    path('api/generate-goal/', include('goals.urls')),
     path('api/sub-goals/', include('goals.urls')),
     path('api/prayers/', include('tasks.prayer_urls')),
     path('api/tasks/', include('tasks.urls')),
