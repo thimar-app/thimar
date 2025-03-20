@@ -18,8 +18,8 @@ function shortenTitle(title: string) {
 export default function GoalCard({ imageSrc, title, progress }: GoalCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   return (
-    <Card className="overflow-hidden max-w-md mx-auto w-full p-0  group">
-      <CardContent className="p-0">
+    <Card className="overflow-hidden max-w-md mx-auto w-full !p-0 group">
+      <CardContent className="!p-0">
         <div className="relative w-full" style={{ aspectRatio: "5/7.2" }}>
           {/* Using inline style for the specific 5:7 aspect ratio */}
           <div className="absolute p-2 flex-col inset-0 bg-muted flex gap-2 group-hover:bg-card transition-colors duration-300">
@@ -41,7 +41,7 @@ export default function GoalCard({ imageSrc, title, progress }: GoalCardProps) {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span>{progress}%</span>
+              <span>{Math.floor(progress)}%</span>
             </div>
           </div>
         </div>
