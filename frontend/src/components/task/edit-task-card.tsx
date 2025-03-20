@@ -4,17 +4,18 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { CalendarSync, Check } from "lucide-react";
 import { PriorityPopover } from "./priority-popover";
 import { DatePopover } from "./date-popover";
-import { ProjectSelect } from "./project-select";
+import { GoalSelect } from "./goal-select";
 import { Switch } from "@/components/ui/switch";
+import { useTaskContext } from "@/context/TaskContext";
 import { Task } from "@/db/goals";
 
 interface EditTaskCardProps {
   task: Task;
   onClose: () => void;
-  onSave: (updatedTask: Task) => void;
 }
 
-export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
+export function EditTaskCard({ task, onClose }: EditTaskCardProps) {
+  const { updateTask } = useTaskContext();
   const [editedTask, setEditedTask] = useState<Task>({ ...task });
 
   // Reset form when task changes
@@ -36,7 +37,7 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
     }));
   };
 
-  const handleDateChange = (date: Date) => {
+  const handleDateChange = (date: string) => {
     setEditedTask((prev) => ({
       ...prev,
       date,
@@ -59,10 +60,10 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
     }));
   };
 
-  const handleProjectChange = (subGoalId: string) => {
+  const handleSubGoalChange = (subGoalId: string) => {
     setEditedTask((prev) => ({
       ...prev,
-      sub_goal_id: subGoalId,
+      sub_goal: subGoalId, // Update the sub_goal field based on type definition
     }));
   };
 
@@ -74,7 +75,8 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
   };
 
   const handleSave = () => {
-    onSave(editedTask);
+    updateTask(editedTask);
+    onClose();
   };
 
   return (
@@ -95,14 +97,14 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
           onChange={handleDescriptionChange}
         />
         <div className="flex items-center gap-2 mt-2">
-          {/* <DatePopover 
-            selectedDate={editedTask.date} 
-            onDateSelect={handleDateChange} 
+          <DatePopover
+            selectedDate={editedTask.date}
+            onDateSelect={handleDateChange}
           />
-          <PriorityPopover 
-            selectedPriority={editedTask.priority} 
-            onPrioritySelect={handlePriorityChange} 
-          /> */}
+          <PriorityPopover
+            selectedPriority={editedTask.priority}
+            onPrioritySelect={handlePriorityChange}
+          />
           <Button
             className={`relative shadow-none h-7 !border-white/20 ${
               editedTask.repeat
@@ -143,10 +145,10 @@ export function EditTaskCard({ task, onClose, onSave }: EditTaskCardProps) {
         </div>
       </CardContent>
       <CardFooter className="!p-2 flex justify-between items-center border-t border-white/20">
-        {/* <ProjectSelect 
-          selectedProjectId={editedTask.sub_goal_id} 
-          onProjectSelect={handleProjectChange}
-        /> */}
+        <GoalSelect
+          selectedSubGoalId={editedTask.sub_goal}
+          onSubGoalSelect={handleSubGoalChange}
+        />
         <div className="space-x-2">
           <Button size={"sm"} variant={"secondary"} onClick={onClose}>
             Cancel

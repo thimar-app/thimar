@@ -67,7 +67,7 @@ export function HomePreferenceActions({
       </PopoverTrigger>
       <PopoverContent className="w-[240px] p-2 " align="end">
         <span className="text-xs font-semibold">View</span>
-        <Card className="p-0 bg-transparent border-0 gap-2 shadow-none my-2">
+        <Card className="!p-0 bg-transparent border-0 gap-2 shadow-none my-2">
           <div className="relative grid grid-cols-3 bg-card rounded-lg p-1 gap-1">
             {views.map((option) => (
               <Button

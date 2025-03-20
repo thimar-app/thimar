@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -6,16 +5,32 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Check, Flag } from "lucide-react";
-import { useState } from "react";
 
-export function PriorityPopover() {
-  const colorList = [
-    "text-red-500",
-    "text-yellow-500",
-    "text-blue-500",
-    "text-muted-foreground",
-  ];
-  const [activeIndex, setActiveIndex] = useState(3);
+type PriorityType = "Low" | "Medium" | "High" | "Urgent";
+
+interface PriorityPopoverProps {
+  selectedPriority: PriorityType;
+  onPrioritySelect: (priority: PriorityType) => void;
+}
+
+export function PriorityPopover({
+  selectedPriority,
+  onPrioritySelect,
+}: PriorityPopoverProps) {
+  // Map priority values to colors and display names
+  const priorityConfig = {
+    Urgent: { color: "text-red-500", label: "P1" },
+    High: { color: "text-yellow-500", label: "P2" },
+    Medium: { color: "text-blue-500", label: "P3" },
+    Low: { color: "text-muted-foreground", label: "P4" },
+  };
+
+  // Array of priority values in order from highest to lowest
+  const priorityValues: PriorityType[] = ["Urgent", "High", "Medium", "Low"];
+
+  // Get the color for the currently selected priority
+  const selectedColor = priorityConfig[selectedPriority].color;
+  const selectedLabel = priorityConfig[selectedPriority].label;
 
   return (
     <Popover>
@@ -25,26 +40,26 @@ export function PriorityPopover() {
           variant="outline"
           size={"sm"}
         >
-          <Flag className={`${colorList[activeIndex]}`} />
-          <span>{activeIndex === 3 ? "Priority" : `P${activeIndex + 1}`} </span>
+          <Flag className={selectedColor} />
+          <span>{selectedLabel}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-max p-0 rounded-lg overflow-hidden">
         <div className="flex flex-col">
-          {colorList.map((color, index) => (
+          {priorityValues.map((priority) => (
             <Button
-              onClick={() => {
-                setActiveIndex(index);
-              }}
+              onClick={() => onPrioritySelect(priority)}
               className={`rounded-none ${
-                activeIndex !== index ? "pr-8" : "pr-2"
+                selectedPriority !== priority ? "pr-8" : "pr-2"
               }`}
               variant={"ghost"}
-              key={color}
+              key={priority}
             >
-              <Flag className={color} />
-              <span> Priority {index + 1}</span>
-              {activeIndex === index && <Check className="text-red-500" />}
+              <Flag className={priorityConfig[priority].color} />
+              <span> {priority}</span>
+              {selectedPriority === priority && (
+                <Check className="text-green-500" />
+              )}
             </Button>
           ))}
         </div>

@@ -56,7 +56,6 @@
 //   );
 // }
 
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import GoalHeader from "./header";
@@ -72,6 +71,7 @@ export default function GoalDetails() {
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [currentGoal, setCurrentGoal] = useState<any>(null);
 
   const goal = goalId ? getGoalById(goalId) : undefined;
 
@@ -79,8 +79,9 @@ export default function GoalDetails() {
     if (goal) {
       setTitle(goal.name);
       setDescription(goal.description || "");
+      setCurrentGoal(goal); // Keep a local copy for immediate UI update
     }
-  }, [goal]);
+  }, [goal?.name, goal?.description]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -90,16 +91,20 @@ export default function GoalDetails() {
     setDescription(e.target.value);
   };
 
-  const handleTitleBlur = () => {
-    if (goal) {
-      updateGoal({ ...goal, name: title });
+  const handleTitleBlur = async () => {
+    if (goal && title.trim() !== goal.name) {
+      const updatedGoal = { ...goal, name: title };
+      setCurrentGoal(updatedGoal);
+      await updateGoal(updatedGoal);
       setIsEditingTitle(false);
     }
   };
 
-  const handleDescriptionBlur = () => {
-    if (goal) {
-      updateGoal({ ...goal, description });
+  const handleDescriptionBlur = async () => {
+    if (goal && description.trim() !== goal.description) {
+      const updatedGoal = { ...goal, description };
+      setCurrentGoal(updatedGoal);
+      await updateGoal(updatedGoal);
       setIsEditingDescription(false);
     }
   };
@@ -108,8 +113,10 @@ export default function GoalDetails() {
     const file = e.target.files?.[0];
     if (file && goal) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        updateGoal({ ...goal, image: reader.result as string });
+      reader.onloadend = async () => {
+        const updatedGoal = { ...goal, image: reader.result as string };
+        setCurrentGoal(updatedGoal);
+        await updateGoal(updatedGoal);
       };
       reader.readAsDataURL(file);
     }
@@ -121,11 +128,13 @@ export default function GoalDetails() {
 
   return (
     <main className="flex flex-col">
-      <GoalHeader title={goal.name} />
+      <GoalHeader title={title} id={goal.id} />
       <section className="flex items-center gap-3">
         <div
           style={{
-            backgroundImage: goal.image ? `url(${goal.image})` : undefined,
+            backgroundImage: currentGoal?.image
+              ? `url(${currentGoal.image})`
+              : undefined,
             backgroundPosition: "center",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
@@ -133,7 +142,7 @@ export default function GoalDetails() {
           className="w-full p-4 relative h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 overflow-hidden"
         >
           {/* Black and blur overlay */}
-          {goal.image && (
+          {currentGoal?.image && (
             <div
               className="absolute inset-0 bg-black/70 backdrop-blur-xs"
               aria-hidden="true"
@@ -141,7 +150,7 @@ export default function GoalDetails() {
           )}
 
           {/* Content */}
-          <div className="relative z-10 w-full  text-center">
+          <div className="relative z-10 w-full text-center">
             {isEditingTitle ? (
               <input
                 type="text"
@@ -153,10 +162,10 @@ export default function GoalDetails() {
               />
             ) : (
               <h2
-                className="font-semibold text-2xl text-center"
+                className="font-semibold text-2xl text-center cursor-pointer"
                 onClick={() => setIsEditingTitle(true)}
               >
-                {goal.name}
+                {title}
               </h2>
             )}
             {isEditingDescription ? (
@@ -170,10 +179,10 @@ export default function GoalDetails() {
               />
             ) : (
               <p
-                className="text-muted-foreground"
+                className="text-muted-foreground cursor-pointer"
                 onClick={() => setIsEditingDescription(true)}
               >
-                {goal.description}
+                {description}
               </p>
             )}
           </div>
@@ -182,10 +191,8 @@ export default function GoalDetails() {
           <Button
             size="icon"
             variant="outline"
-            className="absolute right-0 m-4 bottom-0 !bg-card hover:!bg-accent ml-auto z-10"
-            onClick={() =>
-              document.getElementById("image-upload")?.click()
-            }
+            className="absolute right-0 m-4 bottom-0 !bg-card/40 hover:!bg-card ml-auto z-10"
+            onClick={() => document.getElementById("image-upload")?.click()}
           >
             <ImageUp className="size-6" strokeWidth={1} />
           </Button>
@@ -203,10 +210,10 @@ export default function GoalDetails() {
           <div className="w-full h-3 rounded-full bg-muted-foreground/30">
             <div
               className="bg-violet-600 h-3 rounded-full transition-all duration-300 ease-in-out"
-              style={{ width: `${goal.progress}%` }}
+              style={{ width: `${currentGoal?.progress}%` }}
             />
           </div>
-          <span>{Math.round(goal.progress)}%</span>
+          <span>{Math.round(currentGoal?.progress || 0)}%</span>
         </div>
         <Button className="!px-12 h-12 bg-violet-600 rounded-lg">
           <Sparkles />
@@ -215,7 +222,7 @@ export default function GoalDetails() {
       </section>
 
       <section className="flex bg-muted items-center gap-4 p-5 rounded-lg">
-        <GoalListView goal={goal} showCompletedTasks />
+        <GoalListView goal={currentGoal} showCompletedTasks />
       </section>
     </main>
   );

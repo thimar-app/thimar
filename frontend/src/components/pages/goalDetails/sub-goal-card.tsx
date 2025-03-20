@@ -222,7 +222,6 @@
 
 // export default SubGoalItem;
 
-
 import React, { useState, useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useGoalContext } from "@/context/GoalContext";
@@ -239,7 +238,6 @@ import {
   ChevronRight,
   CirclePlus,
   GripVertical,
-  Edit,
   Save,
   X,
   PenLine,
@@ -276,7 +274,6 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
   const { moveSubGoal, updateSubGoal } = useGoalContext();
   const {
     tasks,
-    addTask,
     toggleTaskStatus,
     deleteTask,
     updateTask,
@@ -329,7 +326,7 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
 
   const [, dropTask] = useDrop({
     accept: ItemTypes.TASK,
-    drop(item: { id: string; subGoalId: string }, monitor) {
+    drop(item: { id: string; subGoalId: string }) {
       const task = tasks.find((t) => t.id === item.id);
       if (!task || task.sub_goal === subGoal.id) return;
       const updatedTask = { ...task, sub_goal_id: subGoal.id };
@@ -358,7 +355,12 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
                 className="h-8"
                 autoFocus
               />
-              <Button size="sm" variant="ghost" onClick={handleSaveTitle} className="p-1 h-8 w-8">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleSaveTitle}
+                className="p-1 h-8 w-8"
+              >
                 <Save size={16} />
               </Button>
               <Button

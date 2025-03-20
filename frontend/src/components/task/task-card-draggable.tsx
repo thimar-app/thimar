@@ -30,7 +30,6 @@ const TaskCardDraggable: React.FC<TaskItemDraggableProps> = ({
   isEditing,
   editingTask,
   setEditingTask,
-  updateTask,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -66,14 +65,7 @@ const TaskCardDraggable: React.FC<TaskItemDraggableProps> = ({
 
   if (isEditing && editingTask) {
     return (
-      <EditTaskCard
-        task={editingTask}
-        onClose={() => setEditingTask(null)}
-        onSave={(updatedTask) => {
-          updateTask(updatedTask);
-          setEditingTask(null);
-        }}
-      />
+      <EditTaskCard task={editingTask} onClose={() => setEditingTask(null)} />
     );
   }
 

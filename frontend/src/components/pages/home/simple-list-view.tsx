@@ -14,6 +14,7 @@ interface SimpleListViewProps {
   showGoals?: boolean;
   todayTasks?: boolean;
   onEditTask?: (task: Task) => void;
+  tasks?: Task[]; // Added optional tasks prop
 }
 
 // Utility function to check if a date is today (ignores time)
@@ -31,28 +32,30 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
   showCompletedTasks,
   todayTasks = false,
   onEditTask,
+  tasks: propTasks, // Renamed to propTasks to avoid conflict
 }) => {
   const {
-    tasks,
+    tasks: contextTasks,
     moveTask,
     toggleTaskStatus,
     deleteTask,
-    updateTask,
     editingTask,
     setEditingTask,
   } = useTaskContext();
 
   const [isAddingTask, setIsAddingTask] = useState(false);
 
+  // Use propTasks if provided, otherwise use contextTasks
+  const tasksToUse = propTasks || contextTasks;
+
   // Apply filtering based on props
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasksToUse.filter((task) => {
     const isTaskToday = isToday(new Date(task.date));
     const isTaskCompleted = task.status; // true means completed
 
     if (todayTasks) {
       return isTaskToday && (showCompletedTasks || !isTaskCompleted);
     }
-
     return showCompletedTasks || !isTaskCompleted;
   });
 
@@ -65,7 +68,7 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full ">
+      <div className="w-full">
         {filteredTasks.length > 0 ? (
           <ul className="divide-y">
             {filteredTasks.map((task, index) =>
@@ -74,10 +77,6 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
                   key={task.id}
                   task={editingTask}
                   onClose={() => setEditingTask(null)}
-                  onSave={(updatedTask) => {
-                    updateTask(updatedTask);
-                    setEditingTask(null);
-                  }}
                 />
               ) : (
                 <TaskCard
@@ -95,17 +94,29 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
           </ul>
         ) : (
           <div className="text-center text-muted-foreground">
-            <p className="font-semibold">What do you need to get done today?</p>
-            <p className="text-sm">
-              By default, tasks added here will be scheduled for today.
-            </p>
+            {todayTasks ? (
+              <div className="text-center text-muted-foreground">
+                <p className="font-semibold">
+                  What do you need to get done today?
+                </p>
+                <p className="text-sm">
+                  By default, tasks added here will be scheduled for today.
+                </p>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground">
+                <p className="font-semibold">What do you need to get done?</p>
+              </div>
+            )}
           </div>
         )}
-
         {isAddingTask && (
-          <AddTaskCard subGoalId="" onClose={() => setIsAddingTask(false)} />
+          <AddTaskCard
+            todayTask={todayTasks}
+            subGoalId=""
+            onClose={() => setIsAddingTask(false)}
+          />
         )}
-
         <Button
           variant="ghost"
           className={`mt-2 px-3 gap-3 text-muted-foreground ${
@@ -113,7 +124,7 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
           } w-full cursor-pointer`}
           onClick={() => setIsAddingTask(true)}
         >
-          <CirclePlus className="!size-5" strokeWidth={1} />
+          <CirclePlus className="size-5" strokeWidth={1} />
           Add Task
         </Button>
       </div>

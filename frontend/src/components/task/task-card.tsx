@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, PenLine, X, Calendar, Repeat } from "lucide-react";
+import { GripVertical, PenLine, X, Calendar, Repeat, Flag } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,7 @@ import {
 import { useDrag, useDrop } from "react-dnd";
 import React, { useState } from "react";
 import { Task } from "@/db/goals";
+import { useGoalContext } from "@/context/GoalContext";
 
 interface TaskItemProps {
   task: Task;
@@ -53,7 +54,6 @@ const formatDate = (date: Date | string): string => {
   });
 };
 
-
 const priorityVariantMap = {
   Low: "outline",
   Medium: "secondary",
@@ -72,6 +72,7 @@ const TaskCard: React.FC<TaskItemProps> = ({
 }) => {
   const ref = React.useRef<HTMLLIElement>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { getGoalBySubGoalId } = useGoalContext();
 
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.TASK,
@@ -80,6 +81,11 @@ const TaskCard: React.FC<TaskItemProps> = ({
       isDragging: monitor.isDragging(),
     }),
   });
+
+  const getGoalName = (subGoalId: string) => {
+    const parentGoal = getGoalBySubGoalId(subGoalId);
+    return parentGoal ? parentGoal.name : subGoalId;
+  };
 
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
     accept: ItemTypes.TASK,
@@ -200,7 +206,7 @@ const TaskCard: React.FC<TaskItemProps> = ({
             {showGoals && (
               <div className=" ml-auto gap-1 items-center flex">
                 <span className="text-sm text-muted-foreground">
-                  {task.name}
+                  {getGoalName(task.sub_goal)}
                 </span>
               </div>
             )}
@@ -210,24 +216,25 @@ const TaskCard: React.FC<TaskItemProps> = ({
           )}
 
           <div className="flex gap-2 mt-1 items-center h-6 flex-wrap">
-            <div className="flex items-center gap-1">
+            <Badge className="bg-transparent border !border-card">
               <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">
                 {formatDate(task.date)}
               </span>
-            </div>
+            </Badge>
 
             <Badge
               variant={priorityVariantMap[task.priority] as any}
-              className="text-xs h-5"
+              className="text-xs h-5 text-muted-foreground"
             >
+              <Flag />
               {task.priority}
             </Badge>
 
             {task.repeat && (
               <div className="flex items-center gap-1">
-                <Repeat className="h-3 w-3 text-purple-500" />
-                <span className="text-xs text-purple-500">Recurring</span>
+                <Repeat className="h-3 w-3 text-primary" />
+                <span className="text-xs text-primary">Recurring</span>
               </div>
             )}
 
@@ -235,7 +242,7 @@ const TaskCard: React.FC<TaskItemProps> = ({
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-neutral-200 size-6 text-muted-foreground"
+                className="hover:bg-neutral-200 !size-6  text-muted-foreground"
                 onClick={handleEditClick}
               >
                 <PenLine className="h-4 w-4" />
@@ -243,7 +250,7 @@ const TaskCard: React.FC<TaskItemProps> = ({
               <Button
                 size="icon"
                 variant="ghost"
-                className="hover:bg-neutral-200 size-6 text-muted-foreground"
+                className="hover:bg-neutral-200 !size-6 text-muted-foreground"
                 onClick={handleDeleteClick}
               >
                 <X className="h-4 w-4" />

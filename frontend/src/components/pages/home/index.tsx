@@ -6,18 +6,7 @@ import PrayerListView from "@/components/pages/home/prayer-list-view";
 import SimpleListView from "@/components/pages/home/simple-list-view";
 import HomePrayerTimeSection from "./home-prayer-time-section";
 import { useTaskContext } from "@/context/TaskContext";
-
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  date: Date;
-  sub_goal_id: string | null;
-  prayer_id: string | null;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  status: boolean;
-  repeat: boolean;
-}
+import { Task } from "@/db/goals";
 
 const handleEditTask = (task: Task) => {
   console.log("Editing task:", task);

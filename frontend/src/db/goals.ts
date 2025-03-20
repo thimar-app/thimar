@@ -1,17 +1,5 @@
 export type Priority = "High" | "Medium" | "Low" | "Urgent";
 
-// export type Task = {
-//   id: string;
-//   name: string;
-//   description: string;
-//   date: Date;
-//   sub_goal_id: string;
-//   prayer_id: string | null;
-//   priority: Priority;
-//   status: boolean;
-//   repeat: boolean;
-// };
-
 export type Task = {
   id: string;
   name: string;
