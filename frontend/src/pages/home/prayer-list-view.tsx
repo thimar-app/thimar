@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
-import { AddTaskCard } from "@/components/task/add-task-card";
+import { AddTaskCard } from "@/components/common/task/add-task-card";
 
 // Define TypeScript interfaces
 interface Task {

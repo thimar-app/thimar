@@ -2,7 +2,7 @@
 // import React, { useState } from "react";
 // import { DndProvider } from "react-dnd";
 // import { HTML5Backend } from "react-dnd-html5-backend";
-// import { Goal, SubGoal } from "@/db/goals";
+// import { Goal, SubGoal } from "@/lib/types";
 // import { useGoalContext } from "@/context/GoalContext";
 // import SubGoalItem from "@/components/pages/goalDetails/sub-goal-card";
 // import { Button } from "@/components/ui/button";

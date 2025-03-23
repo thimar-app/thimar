@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -13,8 +11,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Volume2 } from "lucide-react";
-import sounds from "@/db/sounds";
-import { quranList, reciterList } from "@/db/quran";
+import sounds from "@/data/sounds";
+import { quranList, reciterList } from "@/data/quran";
 
 // Update the TimerSettings interface to include the new playNextSurah setting
 interface TimerSettings {

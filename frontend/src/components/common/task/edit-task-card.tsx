@@ -7,7 +7,7 @@ import { DatePopover } from "./date-popover";
 import { GoalSelect } from "./goal-select";
 import { Switch } from "@/components/ui/switch";
 import { useTaskContext } from "@/context/TaskContext";
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 
 interface EditTaskCardProps {
   task: Task;

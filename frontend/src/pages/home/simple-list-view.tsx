@@ -1,13 +1,13 @@
-import { EditTaskCard } from "@/components/task/edit-task-card";
+import { EditTaskCard } from "@/components/common/task/edit-task-card";
 import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useTaskContext } from "@/context/TaskContext";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
-import { AddTaskCard } from "@/components/task/add-task-card";
-import TaskCard from "@/components/task/task-card";
-import { Task } from "@/db/goals";
+import { AddTaskCard } from "@/components/common/task/add-task-card";
+import TaskCard from "@/components/common/task/task-card";
+import { Task } from "@/lib/types";
 
 interface SimpleListViewProps {
   showCompletedTasks: boolean;

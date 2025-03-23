@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import GoalsHeader from "./header";
 import { CirclePlus, Loader, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import GoalCard from "./goal-card";
+import GoalCard from "../../components/common/goal/goal-card";
 import { useGoalContext } from "@/context/GoalContext";
 import {
   Dialog,
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { generateNewGoalFromAI } from "@/services/aiApi"; // <-- NEW import
-import AddGoalDialog from "@/components/sidebar/add-goal-dialog";
+import AddGoalDialog from "@/components/common/goal/add-goal-dialog";
 
 export default function Goals() {
   const { goals, addGoal, calculateOverallProgress } = useGoalContext();

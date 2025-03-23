@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { CalendarSync, Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTaskContext } from "@/context/TaskContext";
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 import { PriorityPopover } from "./priority-popover";
 import { DatePopover } from "./date-popover";
 import { GoalSelect } from "./goal-select";

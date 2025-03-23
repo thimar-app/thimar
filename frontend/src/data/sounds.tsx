@@ -2,7 +2,6 @@ import {
   Bird,
   CloudRain,
   CloudLightning,
-  Droplets,
   Waves,
   Coffee,
   Flame,

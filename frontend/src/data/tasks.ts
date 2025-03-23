@@ -1,5 +1,3 @@
-// import { Task } from "./goals";
-
 // export const mockTasks: Task[] = [
 //   {
 //     id: "8a7b6c5d-4e3f-2a1b-9c8d-7e6f5a4b3c2d",

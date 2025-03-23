@@ -2,8 +2,8 @@ import * as React from "react";
 import { Goal, CircleCheckBig, Pentagon, Clock9 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
-import { NavMain } from "@/components/sidebar/nav-main";
-import { NavGoals } from "@/components/sidebar/nav-goals";
+import { NavMain } from "@/components/layouts/sidebar/nav-main";
+import { NavGoals } from "@/components/layouts/sidebar/nav-goals";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { ProfileActions } from "@/components/sidebar/profile-actions";
+import { ProfileActions } from "@/components/layouts/sidebar/profile-actions";
 import { useGoalContext } from "@/context/GoalContext";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

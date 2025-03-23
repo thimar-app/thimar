@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TimerPreferences } from "@/components/pages/pomodoros/timer-preferences";
-import { SoundPreferences } from "@/components/pages/pomodoros/sound-preferences";
+import { TimerPreferences } from "@/pages/pomodoro/timer-preferences";
+import { SoundPreferences } from "@/pages/pomodoro/sound-preferences";
 import { cn } from "@/lib/utils";
-import { quranList, reciterList } from "@/db/quran";
-import sounds from "@/db/sounds";
+import { quranList, reciterList } from "@/data/quran";
+import sounds from "@/data/sounds";
 
 type TimerState = "pomodoro" | "shortBreak" | "longBreak";
 type TimerStatus = "running" | "paused" | "idle" | "completed";

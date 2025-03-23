@@ -18,7 +18,7 @@
 //   Save,
 //   X,
 // } from "lucide-react";
-// import { SubGoal, Task } from "@/db/goals";
+// import { SubGoal, Task } from "@/lib/types";
 // import { Input } from "@/components/ui/input";
 // import { ItemTypes } from "@/components/pages/goalDetails/item-types";
 // import TaskCardDraggable from "@/components/task/task-card-draggable";
@@ -232,7 +232,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { AddTaskCard } from "@/components/task/add-task-card";
+import { AddTaskCard } from "@/components/common/task/add-task-card";
 import {
   ChevronDown,
   ChevronRight,
@@ -244,7 +244,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ItemTypes } from "./item-types";
-import TaskCardDraggable from "@/components/task/task-card-draggable";
+import TaskCardDraggable from "@/components/common/task/task-card-draggable";
 
 interface SubGoalItemProps {
   subGoal: {

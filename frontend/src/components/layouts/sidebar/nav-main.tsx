@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoalContext } from "@/context/GoalContext";
-import AddGoalDialog from "./add-goal-dialog";
+import AddGoalDialog from "../../common/goal/add-goal-dialog";
 
 export function NavMain({
   items,

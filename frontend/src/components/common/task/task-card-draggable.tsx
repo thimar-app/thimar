@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
-import { Task } from "@/db/goals";
-import TaskCard from "@/components/task/task-card";
-import { ItemTypes } from "@/components/pages/goalDetails/item-types";
-import { EditTaskCard } from "@/components/task/edit-task-card";
+import { Task } from "@/lib/types";
+import TaskCard from "@/components/common/task/task-card";
+import { ItemTypes } from "@/pages/goal-view/item-types";
+import { EditTaskCard } from "@/components/common/task/edit-task-card";
 
 interface TaskItemDraggableProps {
   task: Task;

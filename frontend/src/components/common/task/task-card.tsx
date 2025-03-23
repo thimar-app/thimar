@@ -15,7 +15,7 @@ import {
 
 import { useDrag, useDrop } from "react-dnd";
 import React, { useState } from "react";
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 import { useGoalContext } from "@/context/GoalContext";
 
 interface TaskItemProps {

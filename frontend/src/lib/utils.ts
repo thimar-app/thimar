@@ -47,8 +47,7 @@
 //   return calculateTaskProgress(subGoal.tasks);
 // };
 
-
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 
 export function cn(...classes: string[]): string {
   return classes.filter(Boolean).join(" ");
@@ -62,7 +61,7 @@ export interface TaskProgress {
 export function calculateTaskProgress(tasks: Task[]): TaskProgress {
   const total = tasks.length;
   if (total === 0) return { percentage: 0, formattedPercentage: "0%" };
-  const completed = tasks.filter(task => task.status).length;
+  const completed = tasks.filter((task) => task.status).length;
   const percentage = (completed / total) * 100;
   return {
     percentage,
