@@ -13,16 +13,11 @@ import {
 } from "@/components/ui/sidebar";
 
 import { ProfileActions } from "@/components/sidebar/profile-actions";
-import { GoalProvider, useGoalContext } from "@/context/GoalContext";
-import { useEffect } from "react";
+import { useGoalContext } from "@/context/GoalContext";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { goals, fetchGoals } = useGoalContext();
+  const { goals } = useGoalContext();
   const location = useLocation();
-
-  // useEffect(() => {
-  //   fetchGoals();
-  // }, []);
 
   const goalsList = goals.map((g) => ({
     name: g.name,
@@ -56,20 +51,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   return (
-    // <GoalProvider>
-      <Sidebar className="border-r-0" {...props}>
-        <SidebarHeader>
-          <div className="flex justify-between gap-2 items-center mt-1.5">
-            <ProfileActions />
-            <SidebarTrigger />
-          </div>
-          <NavMain items={navItems} />
-        </SidebarHeader>
-        <SidebarContent>
-          <NavGoals goals={goalsList} showMore={true} />
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
-    // </GoalProvider>
+    <Sidebar className="border-r-0" {...props}>
+      <SidebarHeader>
+        <div className="flex justify-between gap-2 items-center mt-1.5">
+          <ProfileActions />
+          <SidebarTrigger />
+        </div>
+        <NavMain items={navItems} />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavGoals goals={goalsList} showMore={true} />
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
   );
 }

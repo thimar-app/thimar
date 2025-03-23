@@ -22,7 +22,7 @@ import { Link } from "react-router-dom";
 function shortenTitle(title: string) {
   // Updated to use 28 as the threshold
   if (title.length > 28) {
-    return title.substring(0, 24) + "...";
+    return title.substring(0, 23) + "...";
   } else {
     return title;
   }

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { useGoalContext } from "@/context/GoalContext";
+import AddGoalDialog from "./add-goal-dialog";
 
 export function NavMain({
   items,
@@ -50,15 +51,18 @@ export function NavMain({
           </Link>
         </SidebarMenuItem>
       ))}
-      <SidebarMenuItem className="mt-4">
-        <SidebarMenuButton
-          onClick={handleAddGoal}
-          className="text-foreground bg-sidebar-accent hover:bg-sidebar-primary cursor-pointer justify-center border border-dashed"
-        >
-          <CirclePlus strokeWidth={1.5} />
-          <span>Add Goal</span>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+
+      <AddGoalDialog>
+        <SidebarMenuItem className="mt-4">
+          <SidebarMenuButton
+            onClick={handleAddGoal}
+            className="text-foreground bg-sidebar-accent hover:bg-sidebar-primary cursor-pointer justify-center border border-dashed"
+          >
+            <CirclePlus strokeWidth={1.5} />
+            <span>Add Goal</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </AddGoalDialog>
     </SidebarMenu>
   );
 }

@@ -72,9 +72,9 @@ export function ProfileActions() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 px-2 w-max data-[state=open]:bg-accent"
+          className="h-7 px-0.5 w-max data-[state=open]:bg-accent"
         >
-          <Avatar className="size-6">
+          <Avatar className="!size-6">
             <AvatarImage src="https://avatars.githubusercontent.com/u/98880087" />
             <AvatarFallback>NZ</AvatarFallback>
           </Avatar>
@@ -84,11 +84,11 @@ export function ProfileActions() {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-56 overflow-hidden rounded-lg p-0"
+        className="!w-56 overflow-hidden rounded-lg !p-0"
         align="start"
       >
         <Sidebar collapsible="none" className="bg-transparent">
-          <SidebarContent>
+          <SidebarContent className="!p-0">
             {data.map((group, index) => (
               <SidebarGroup key={index} className="border-b last:border-none">
                 <SidebarGroupContent className="gap-0">
