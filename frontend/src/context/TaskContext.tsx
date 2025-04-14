@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { calculateTaskProgress, TaskProgress } from "@/lib/utils";
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 import {
   addTaskApi,
   fetchTasksApi,

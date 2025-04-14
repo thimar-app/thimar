@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "./Layout";
-import Home from "@/components/pages/home";
-import Goals from "@/components/pages/goals";
-import GoalDetails from "@/components/pages/goalDetails";
-import Tasks from "./components/pages/tasks";
+import Layout from "@/components/layouts/main-layout";
+import Home from "@/pages/home";
+import Goals from "@/pages/goals";
+import GoalDetails from "@/pages/goal-view";
+import Tasks from "./pages/tasks";
 import { GoalProvider } from "./context/GoalContext";
-import Pomodoro from "./components/pages/pomodoros";
+import Pomodoro from "@/pages/pomodoro";
 
 const App = () => {
   return (
