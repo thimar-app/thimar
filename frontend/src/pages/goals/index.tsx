@@ -247,7 +247,7 @@ export default function Goals() {
                   <GoalCard
                     progress={goal.progress}
                     title={goal.name}
-                    imageSrc={goal.image}
+                    image_url={goal.image_url}
                   />
                 </Link>
               ))}
