@@ -78,17 +78,17 @@ export default function GoalDetails() {
     }
   };
 
-  // Image upload (unchanged)
+  // Image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && goal) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const updatedGoal = { ...goal, image: reader.result as string };
-        setCurrentGoal(updatedGoal);
-        await updateGoal(updatedGoal);
-      };
-      reader.readAsDataURL(file);
+      // Create a FormData object to send the file
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('id', goal.id);
+      
+      // Update the goal with the image file
+      updateGoal(formData);
     }
   };
 
@@ -170,8 +170,8 @@ export default function GoalDetails() {
       <section className="flex items-center gap-3">
         <div
           style={{
-            backgroundImage: currentGoal?.image
-              ? `url(${currentGoal.image})`
+            backgroundImage: currentGoal?.image_url
+              ? `url(${currentGoal.image_url})`
               : undefined,
             backgroundPosition: "center",
             backgroundSize: "cover",
@@ -179,7 +179,7 @@ export default function GoalDetails() {
           }}
           className="w-full p-4 relative h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 overflow-hidden"
         >
-          {currentGoal?.image && (
+          {currentGoal?.image_url && (
             <div
               className="absolute inset-0 bg-black/70 backdrop-blur-xs"
               aria-hidden="true"

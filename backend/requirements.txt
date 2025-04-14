@@ -16,3 +16,5 @@ celery
 django-redis>=4.12 
 # API documentation
 drf-yasg>=1.20
+
+supabase>=2.0.0,<3.0.0

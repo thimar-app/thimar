@@ -34,10 +34,8 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
 # DEBUG = env('DEBUG')
-# DEBUG = True
-DEBUG = False
+DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = ['thimar.onrender.com','127.0.0.1','localhost']
@@ -80,6 +78,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
 }
 
 

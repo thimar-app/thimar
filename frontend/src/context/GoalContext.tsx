@@ -23,7 +23,8 @@ export interface Goal {
   user: number;
   name: string;
   description?: string;
-  image?: string;
+  image_url?: string;
+  image_path?: string;
   created_at: string;
   updated_at: string;
   progress: number;
@@ -76,8 +77,28 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addGoal = async (goal: any) => {
     try {
-      const newGoal = await addGoalApi(goal);
-      setGoals((prev) => [...prev, newGoal]);
+      // If goal is FormData, it's a file upload with image field
+      if (goal instanceof FormData) {
+        // We need to get the auth token and user ID
+        const token = localStorage.getItem('supabase_token') || '';
+        const userId = localStorage.getItem('user_id') || '';
+        
+        const newGoal = await addGoalApi(goal, null, goal, userId, token);
+        setGoals((prev) => [...prev, newGoal]);
+      } else {
+        // Otherwise, it's a regular goal object
+        const token = localStorage.getItem('supabase_token') || '';
+        const userId = localStorage.getItem('user_id') || '';
+        
+        const newGoal = await addGoalApi(
+          { title: goal.title, description: goal.description }, 
+          null, 
+          new FormData(), 
+          userId, 
+          token
+        );
+        setGoals((prev) => [...prev, newGoal]);
+      }
     } catch (error) {
       console.error("Error adding goal", error);
     }
@@ -85,10 +106,19 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateGoal = async (updatedGoal: any) => {
     try {
-      const newGoal = await updateGoalApi(updatedGoal);
-      setGoals((prev) =>
-        prev.map((goal) => (goal.id === newGoal.id ? newGoal : goal))
-      );
+      // If updatedGoal is FormData, it's a file upload with image field
+      if (updatedGoal instanceof FormData) {
+        const newGoal = await updateGoalApi(updatedGoal);
+        setGoals((prev) =>
+          prev.map((goal) => (goal.id === newGoal.id ? newGoal : goal))
+        );
+      } else {
+        // Otherwise, it's a regular goal object
+        const newGoal = await updateGoalApi(updatedGoal);
+        setGoals((prev) =>
+          prev.map((goal) => (goal.id === newGoal.id ? newGoal : goal))
+        );
+      }
     } catch (error) {
       console.error("Error updating goal", error);
     }

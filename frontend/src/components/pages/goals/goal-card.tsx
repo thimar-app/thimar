@@ -4,7 +4,7 @@ import { useState } from "react";
 interface GoalCardProps {
   title: string;
   progress: number;
-  imageSrc?: string;
+  image_url?: string;
 }
 
 function shortenTitle(title: string) {
@@ -15,7 +15,7 @@ function shortenTitle(title: string) {
   }
 }
 
-export default function GoalCard({ imageSrc, title, progress }: GoalCardProps) {
+export default function GoalCard({ image_url, title, progress }: GoalCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   return (
     <Card className="overflow-hidden max-w-md mx-auto w-full !p-0 group">
@@ -24,7 +24,7 @@ export default function GoalCard({ imageSrc, title, progress }: GoalCardProps) {
           {/* Using inline style for the specific 5:7 aspect ratio */}
           <div className="absolute p-2 flex-col inset-0 bg-muted flex gap-2 group-hover:bg-card transition-colors duration-300">
             <img
-              src={imageSrc || "/placeholder.svg"}
+              src={image_url || "/placeholder.svg"}
               alt=""
               className={`aspect-[5/5.5] rounded-md object-cover object-center transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
