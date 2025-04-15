@@ -27,6 +27,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { logoutUser } from "@/api/auth";
 
 const data = [
   [
@@ -58,6 +59,20 @@ const data = [
     },
   ],
 ];
+const handleLogout = async () => {
+  try {
+    const refresh = localStorage.getItem("refresh");
+    if (refresh) {
+      await logoutUser(refresh);
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+  } finally {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    window.location.href = "/"; // Redirige vers la page de connexion après déconnexion
+  }
+};
 
 export function ProfileActions() {
   const [isOpen, setIsOpen] = useState(false);
@@ -93,13 +108,13 @@ export function ProfileActions() {
               <SidebarGroup key={index} className="border-b last:border-none">
                 <SidebarGroupContent className="gap-0">
                   <SidebarMenu>
-                    {group.map((item, index) => (
-                      <SidebarMenuItem key={index}>
-                        <SidebarMenuButton>
-                          <item.icon /> <span>{item.label}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                  {group.map((item, index) => (
+  <SidebarMenuItem key={index}>
+    <SidebarMenuButton onClick={() => handleLogout()}>
+      <item.icon /> <span>{item.label}</span>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+))}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

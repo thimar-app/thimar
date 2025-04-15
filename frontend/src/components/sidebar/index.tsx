@@ -32,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navItems = [
     {
       title: "Home",
-      url: "/",
+      url: "/home",
       icon: Pentagon,
     },
     {
