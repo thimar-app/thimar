@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { getUserProfile, refreshToken, UserData } from '../api/auth';
+import { getUserProfile, refreshToken, UserData } from '../services/auth';
 
 interface AuthContextType {
   currentUser: UserData | null;

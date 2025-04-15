@@ -1,15 +1,4 @@
-import axios from "axios";
-
-// Update the API base URL to ensure it's correct
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-
-// Helper to get token (adjust per your auth logic)
-const getAuthHeader = () => {
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2OTk2MzM1LCJpYXQiOjE3NDQ1NzcxMzUsImp0aSI6IjU1ODI4YjcyYjIwZjQ2Y2Y4MzQxNzE0MjlkMTYyODlhIiwidXNlcl9pZCI6N30.fzgD3HZp4HrvjxiEjx4Oe14TlIWD9WlpiiWw286nnGc";
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2OTk2MzM1LCJpYXQiOjE3NDQ1NzcxMzUsImp0aSI6IjU1ODI4YjcyYjIwZjQ2Y2Y4MzQxNzE0MjlkMTYyODlhIiwidXNlcl9pZCI6N30.fzgD3HZp4HrvjxiEjx4Oe14TlIWD9WlpiiWw286nnGc";
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+import api from './axios';
 
 /**
  * Calls your AI endpoint e.g. POST /gen-ai/new-goal
@@ -17,19 +6,10 @@ const getAuthHeader = () => {
  * Returns { goal: "...", description: "..." }
  */
 export async function generateNewGoalFromAI(existingGoals: any[], previousGenerations: any[] = []) {
-  const response = await axios.post(
-    `${API_BASE_URL}/gen-ai/new-goal/`,
-    { 
-      existing_goals: existingGoals,
-      previous_generations: previousGenerations
-    },
-    {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await api.post('/gen-ai/new-goal/', { 
+    existing_goals: existingGoals,
+    previous_generations: previousGenerations
+  });
   return response.data; // Returns { goal: "...", description: "..." }
 }
 
@@ -44,16 +24,7 @@ export async function generateNewTaskFromAI(payload: any) {
     payload.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
   
-  const response = await axios.post(
-    `${API_BASE_URL}/gen-ai/new-task/`,
-    payload,
-    {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await api.post('/gen-ai/new-task/', payload);
   return response.data; // Returns structured task data with prayer time
 }
 
@@ -76,16 +47,7 @@ export async function generateBaraqahFromAI(payload: any) {
     
     console.log("Sending baraqah request with payload:", payload);
     
-    const response = await axios.post(
-      `${API_BASE_URL}/gen-ai/generate-baraqah/`,
-      payload,
-      {
-        headers: {
-          ...getAuthHeader(),
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await api.post('/gen-ai/generate-baraqah/', payload);
     
     console.log("Baraqah response:", response.data);
     return response.data; // Returns { message, source, explanation }

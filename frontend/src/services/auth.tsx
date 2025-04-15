@@ -1,8 +1,5 @@
-
-import axios, { AxiosError, AxiosRequestConfig ,InternalAxiosRequestConfig} from 'axios';
-
-
-const API_URL = 'http://127.0.0.1:8000/api/users/';
+import { AxiosError } from 'axios';
+import api from './axios';
 
 // Types definitions
 export interface UserData {
@@ -27,29 +24,9 @@ export interface ApiError {
   [key: string]: any;
 }
 
-// Create axios instance with common configuration
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add interceptor to include auth token in requests
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = localStorage.getItem('access_token');
-    if (token && config.headers) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
 export const registerUser = async (userData: UserData): Promise<UserData> => {
   try {
-    const response = await api.post<UserData>('register/', userData);
+    const response = await api.post<UserData>('/users/register/', userData);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ApiError>;
@@ -59,7 +36,7 @@ export const registerUser = async (userData: UserData): Promise<UserData> => {
 
 export const loginUser = async (credentials: { username: string; password: string }): Promise<TokenResponse> => {
   try {
-    const response = await api.post<TokenResponse>('token/', credentials);
+    const response = await api.post<TokenResponse>('/users/token/', credentials);
     localStorage.setItem('access_token', response.data.access);
     localStorage.setItem('refresh_token', response.data.refresh);
     return response.data;
@@ -69,12 +46,10 @@ export const loginUser = async (credentials: { username: string; password: strin
   }
 };
 
-export const logoutUser = async (refresh: string): Promise<void> => {
+export const logoutUser = async (): Promise<void> => {
   try {
     const refreshToken = localStorage.getItem('refresh_token');
-    await api.post('logout/', { refresh_token: refreshToken });
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    await api.post('/users/logout/', { refresh_token: refreshToken });
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
@@ -89,7 +64,7 @@ export const refreshToken = async (): Promise<TokenResponse> => {
     const refresh = localStorage.getItem('refresh_token');
     if (!refresh) throw new Error('No refresh token available');
     
-    const response = await api.post<TokenResponse>('token/refresh/', { refresh });
+    const response = await api.post<TokenResponse>('/token/refresh/', { refresh });
     localStorage.setItem('access_token', response.data.access);
     return response.data;
   } catch (error) {
@@ -102,7 +77,7 @@ export const refreshToken = async (): Promise<TokenResponse> => {
 
 export const getUserProfile = async (): Promise<UserData> => {
   try {
-    const response = await api.get<UserData>('me/');
+    const response = await api.get<UserData>('/users/me/');
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ApiError>;
@@ -112,7 +87,7 @@ export const getUserProfile = async (): Promise<UserData> => {
 
 export const updateUserProfile = async (userData: UserData): Promise<UserData> => {
   try {
-    const response = await api.patch<UserData>('me/', userData);
+    const response = await api.patch<UserData>('/users/me/', userData);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ApiError>;

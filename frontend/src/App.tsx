@@ -1,23 +1,16 @@
-import { Routes, Route } from "react-router-dom";
-import Layout from "@/components/layouts/main-layout";
-import Home from "@/pages/home";
-import Goals from "@/pages/goals";
-import GoalDetails from "@/pages/goal-view";
-import Tasks from "./pages/tasks";
-import { GoalProvider } from "./context/GoalContext";
-import Pomodoro from "@/pages/pomodoro";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./components/Login";
 import React from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Register from "./components/Register";
-import Home from "./components/pages/home";
 import { GoalProvider } from "./context/GoalContext";
-import Layout from "./Layout";
-import Goals from "./components/pages/goals";
-import GoalDetails from "./components/pages/goalDetails";
-import Tasks from "./components/pages/tasks";
-import Pomodoro from "./components/pages/pomodoros";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Layout from "./components/layouts/main-layout";
+import AuthLayout from "./components/layouts/auth-layout";
+import Home from "./pages/home";
+import Goals from "./pages/goals";
+import GoalDetails from "./pages/goal-view";
+import Tasks from "./pages/tasks";
+import Pomodoro from "./pages/pomodoro";
 
 // const App = () => {
 //   return (
@@ -69,8 +62,17 @@ const App: React.FC = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          } />
+          <Route path="/register" element={
+            <AuthLayout>
+              <Register />
+            </AuthLayout>
+          } />
           <Route
             path="/*"
             element={

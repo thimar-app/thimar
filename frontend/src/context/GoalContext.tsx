@@ -8,7 +8,7 @@ import {
   addSubGoalApi,
   updateSubGoalApi,
   deleteSubGoalApi,
-} from "@/services/api";
+} from "../services/api";
 import { useQueryClient } from "@tanstack/react-query";
 
 // Interfaces matching your backend:

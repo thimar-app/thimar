@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { registerUser, loginUser, getUserProfile, UserData, ApiError } from '../api/auth';
+import { registerUser, loginUser, getUserProfile, UserData, ApiError } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
 
 interface RegisterFormData {
@@ -104,23 +104,23 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-card rounded-lg shadow-md overflow-hidden">
       <div className="px-6 py-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Create an Account</h2>
+        <h2 className="text-2xl font-bold text-center text-foreground mb-8">Create an Account</h2>
         
         {errors.general && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-4">
             {errors.general}
           </div>
         )}
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+            <label className="block text-foreground text-sm font-bold mb-2" htmlFor="username">
               Username
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
               id="username"
               type="text"
               name="username"
@@ -129,16 +129,16 @@ const Register: React.FC = () => {
               required
             />
             {errors.username && (
-              <p className="text-red-500 text-xs italic mt-1">{errors.username}</p>
+              <p className="text-destructive text-xs italic mt-1">{errors.username}</p>
             )}
           </div>
           
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+            <label className="block text-foreground text-sm font-bold mb-2" htmlFor="email">
               Email
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
               id="email"
               type="email"
               name="email"
@@ -147,16 +147,16 @@ const Register: React.FC = () => {
               required
             />
             {errors.email && (
-              <p className="text-red-500 text-xs italic mt-1">{errors.email}</p>
+              <p className="text-destructive text-xs italic mt-1">{errors.email}</p>
             )}
           </div>
           
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <label className="block text-foreground text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               type="password"
               name="password"
@@ -165,16 +165,16 @@ const Register: React.FC = () => {
               required
             />
             {errors.password && (
-              <p className="text-red-500 text-xs italic mt-1">{errors.password}</p>
+              <p className="text-destructive text-xs italic mt-1">{errors.password}</p>
             )}
           </div>
           
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password2">
+            <label className="block text-foreground text-sm font-bold mb-2" htmlFor="password2">
               Confirm Password
             </label>
             <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
               id="password2"
               type="password"
               name="password2"
@@ -183,7 +183,7 @@ const Register: React.FC = () => {
               required
             />
             {errors.password2 && (
-              <p className="text-red-500 text-xs italic mt-1">{errors.password2}</p>
+              <p className="text-destructive text-xs italic mt-1">{errors.password2}</p>
             )}
           </div>
           
@@ -196,23 +196,23 @@ const Register: React.FC = () => {
                 onChange={handleLocationToggle}
                 className="mr-2"
               />
-              <label className="text-gray-700 text-sm font-bold" htmlFor="useLocation">
+              <label className="text-foreground text-sm font-bold" htmlFor="useLocation">
                 Use my current location for prayer times
               </label>
             </div>
             
             {errors.location && (
-              <p className="text-red-500 text-xs italic mb-2">{errors.location}</p>
+              <p className="text-destructive text-xs italic mb-2">{errors.location}</p>
             )}
             
             {useLocation && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="latitude">
+                  <label className="block text-foreground text-sm font-bold mb-2" htmlFor="latitude">
                     Latitude
                   </label>
                   <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
                     id="latitude"
                     type="number"
                     step="any"
@@ -222,11 +222,11 @@ const Register: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="longitude">
+                  <label className="block text-foreground text-sm font-bold mb-2" htmlFor="longitude">
                     Longitude
                   </label>
                   <input
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-background leading-tight focus:outline-none focus:shadow-outline"
                     id="longitude"
                     type="number"
                     step="any"
@@ -239,17 +239,17 @@ const Register: React.FC = () => {
             )}
           </div>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4">
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
               type="submit"
               disabled={loading}
             >
               {loading ? 'Creating Account...' : 'Register'}
             </button>
-            <div className="text-center text-gray-600 mt-2">
+            <div className="text-center text-muted-foreground">
               Already have an account?{' '}
-              <Link to="/" className="text-blue-500 hover:text-blue-700">
+              <Link to="/login" className="text-primary hover:text-primary/90">
                 Login
               </Link>
             </div>

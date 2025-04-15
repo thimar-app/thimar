@@ -7,6 +7,7 @@ import {
   LogOut,
   Settings,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -27,7 +28,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { logoutUser } from "@/api/auth";
+import { logoutUser } from "@/services/auth";
+import { useAuth } from "@/context/AuthContext";
 
 const data = [
   [
@@ -59,27 +61,33 @@ const data = [
     },
   ],
 ];
-const handleLogout = async () => {
-  try {
-    const refresh = localStorage.getItem("refresh");
-    if (refresh) {
-      await logoutUser(refresh);
-    }
-  } catch (err) {
-    console.error("Logout error:", err);
-  } finally {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    window.location.href = "/"; // Redirige vers la page de connexion après déconnexion
-  }
-};
 
 export function ProfileActions() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { currentUser, setCurrentUser } = useAuth();
 
   useEffect(() => {
     setIsOpen(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      // Clear user data from context
+      setCurrentUser(null);
+      // Navigate to login page
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!currentUser?.username) return "U";
+    return currentUser.username.substring(0, 2).toUpperCase();
+  };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -91,10 +99,10 @@ export function ProfileActions() {
         >
           <Avatar className="!size-6">
             <AvatarImage src="https://avatars.githubusercontent.com/u/98880087" />
-            <AvatarFallback>NZ</AvatarFallback>
+            <AvatarFallback>{getUserInitials()}</AvatarFallback>
           </Avatar>
 
-          <span className="font-medium">Nzar</span>
+          <span className="font-medium">{currentUser?.username || "User"}</span>
           <ChevronDown />
         </Button>
       </PopoverTrigger>
@@ -108,13 +116,13 @@ export function ProfileActions() {
               <SidebarGroup key={index} className="border-b last:border-none">
                 <SidebarGroupContent className="gap-0">
                   <SidebarMenu>
-                  {group.map((item, index) => (
-  <SidebarMenuItem key={index}>
-    <SidebarMenuButton onClick={() => handleLogout()}>
-      <item.icon /> <span>{item.label}</span>
-    </SidebarMenuButton>
-  </SidebarMenuItem>
-))}
+                    {group.map((item, index) => (
+                      <SidebarMenuItem key={index}>
+                        <SidebarMenuButton onClick={item.label === "Log out" ? handleLogout : undefined}>
+                          <item.icon /> <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import api from './axios';
 
 // Cache object to store API responses
 const cache = {
@@ -15,13 +13,6 @@ const CACHE_DURATION = 30 * 1000;
 const isCacheValid = (page: number) => {
   const cacheKey = `goals_page_${page}`;
   return cache.goals[cacheKey] && Date.now() - (cache.lastFetch[cacheKey] || 0) < CACHE_DURATION;
-};
-
-// Helper to get auth headers
-const getAuthHeader = () => {
-  const token = localStorage.getItem("access");
-  const token = localStorage.getItem('token') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2OTk2MzM1LCJpYXQiOjE3NDQ1NzcxMzUsImp0aSI6IjU1ODI4YjcyYjIwZjQ2Y2Y4MzQxNzE0MjlkMTYyODlhIiwidXNlcl9pZCI6N30.fzgD3HZp4HrvjxiEjx4Oe14TlIWD9WlpiiWw286nnGc";
-  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 // Helper to convert JSON object to FormData
@@ -52,8 +43,7 @@ export const fetchGoalsApi = async (forceRefresh = false, page = 1, pageSize = 8
 
   // Otherwise fetch fresh data
   console.log(`Making API request for page ${page}`);
-  const response = await axios.get(`${API_BASE_URL}/goals/`, {
-    headers: getAuthHeader(),
+  const response = await api.get('/goals/', {
     params: {
       page,
       page_size: pageSize
@@ -90,9 +80,7 @@ export const fetchGoalByIdApi = async (goalId: string) => {
   // If not in cache, fetch from API
   console.log(`Goal ${goalId} not found in cache, fetching from API`);
   try {
-    const response = await axios.get(`${API_BASE_URL}/goals/${goalId}/`, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.get(`/goals/${goalId}/`);
     
     // Cache the fetched goal
     const goal = response.data;
@@ -107,14 +95,12 @@ export const fetchGoalByIdApi = async (goalId: string) => {
   }
 };
 
-export const addGoalApi = async (goal: FormData | any, retryWithFreshToken: unknown, formData: FormData, userId: string, token: string) => {
+export const addGoalApi = async (goal: FormData | any, formData: FormData, userId: string, token: string) => {
   // For FormData, we don't need to modify anything as the backend expects 'image' field
   // For regular objects, convert to FormData
   const goalData = goal instanceof FormData ? goal : jsonToFormData(goal);
   
-  const response = await axios.post(`${API_BASE_URL}/goals/`, goalData, {
-    headers: getAuthHeader(),
-  });
+  const response = await api.post('/goals/', goalData);
   
   // Invalidate cache to ensure fresh data on next fetch
   cache.goals = {} as Record<string, any>;
@@ -130,9 +116,7 @@ export const updateGoalApi = async (goal: any) => {
       throw new Error('Goal ID is required for update');
     }
     
-    const response = await axios.patch(`${API_BASE_URL}/goals/${goalId}/`, goal, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.patch(`/goals/${goalId}/`, goal);
     
     // Update cache if we have it
     if (Object.keys(cache.goals).length > 0) {
@@ -145,9 +129,7 @@ export const updateGoalApi = async (goal: any) => {
     // For regular JSON objects, convert to FormData
     const goalData = jsonToFormData(goal);
     
-    const response = await axios.patch(`${API_BASE_URL}/goals/${goal.id}/`, goalData, {
-      headers: getAuthHeader(),
-    });
+    const response = await api.patch(`/goals/${goal.id}/`, goalData);
     
     // Update cache if we have it
     if (Object.keys(cache.goals).length > 0) {
@@ -160,9 +142,7 @@ export const updateGoalApi = async (goal: any) => {
 };
 
 export const deleteGoalApi = async (goalId: string) => {
-  const response = await axios.delete(`${API_BASE_URL}/goals/${goalId}/`, {
-    headers: getAuthHeader(),
-  });
+  const response = await api.delete(`/goals/${goalId}/`);
   
   // Update cache if we have it
   if (Object.keys(cache.goals).length > 0) {
@@ -175,8 +155,7 @@ export const deleteGoalApi = async (goalId: string) => {
 
 // SubGoals API
 export const fetchSubGoalsApi = async (page = 1, pageSize = 10) => {
-  const response = await axios.get(`${API_BASE_URL}/goals/sub-goals/`, {
-    headers: getAuthHeader(),
+  const response = await api.get('/goals/sub-goals/', {
     params: {
       page,
       page_size: pageSize
@@ -193,9 +172,7 @@ export const addSubGoalApi = async (subGoal: any) => {
   // Log the data being sent to the backend
   console.log('Adding subgoal with data:', subGoal);
   
-  const response = await axios.post(`${API_BASE_URL}/goals/sub-goals/`, formData, {
-    headers: getAuthHeader(),
-  });
+  const response = await api.post('/goals/sub-goals/', formData);
   
   // Log the response from the backend
   console.log('Subgoal added successfully:', response.data);
@@ -210,9 +187,7 @@ export const updateSubGoalApi = async (subGoal: any) => {
   // Convert to FormData
   const formData = jsonToFormData(subGoal);
   
-  const response = await axios.patch(`${API_BASE_URL}/sub-goals/${subGoal.id}/`, formData, {
-    headers: getAuthHeader(),
-  });
+  const response = await api.patch(`/sub-goals/${subGoal.id}/`, formData);
   
   // Update cache if we have it
   if (cache.goals) {
@@ -228,9 +203,7 @@ export const updateSubGoalApi = async (subGoal: any) => {
 };
 
 export const deleteSubGoalApi = async (subGoalId: string) => {
-  const response = await axios.delete(`${API_BASE_URL}/sub-goals/${subGoalId}/`, {
-    headers: getAuthHeader(),
-  });
+  const response = await api.delete(`/sub-goals/${subGoalId}/`);
   
   // Update cache if we have it
   if (cache.goals) {
