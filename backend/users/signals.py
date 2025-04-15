@@ -14,7 +14,7 @@ def create_default_prayers(sender, instance, created, **kwargs):
             'Sunrise', 
             'Dhuhr', 
             'Asr', 
-            'Sunset', 
+            'Sunset',
             'Maghrib', 
             'Isha'
         ]

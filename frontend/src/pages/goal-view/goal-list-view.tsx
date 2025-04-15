@@ -105,6 +105,7 @@ import { Input } from "@/components/ui/input";
 import { CirclePlus } from "lucide-react";
 import { useAddSubGoalMutation } from "@/services/goalQueries";
 import { toast } from "sonner";
+import { GoalAddTaskCard } from "@/components/common/task/goal-add-task-card";
 
 interface GoalListViewProps {
   goal: Goal | null;
@@ -117,6 +118,8 @@ const GoalListView: React.FC<GoalListViewProps> = ({
 }) => {
   const [isAddingSubGoal, setIsAddingSubGoal] = useState(false);
   const [newSubGoalName, setNewSubGoalName] = useState("");
+  const [showAddTaskCard, setShowAddTaskCard] = useState(false);
+  const [selectedSubGoalId, setSelectedSubGoalId] = useState<string | null>(null);
   
   // Use the mutation hook instead of context
   const addSubGoalMutation = useAddSubGoalMutation(goal?.id || "");
@@ -152,19 +155,28 @@ const GoalListView: React.FC<GoalListViewProps> = ({
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="w-full flex flex-col">
-        {goal?.sub_goals?.length ? (
-          goal.sub_goals.map((subGoal: SubGoal, index: number) => (
+        {goal?.sub_goals?.map((subGoal: SubGoal, index: number) => (
+          <div key={subGoal.id}>
             <SubGoalItem
-              key={subGoal.id}
               subGoal={subGoal}
               index={index}
               goalId={goal.id}
               showCompletedTasks={showCompletedTasks}
             />
-          ))
-        ) : (
-          <p className="text-center text-muted-foreground">No sub-goals yet.</p>
-        )}
+            {showAddTaskCard && selectedSubGoalId === subGoal.id && (
+              <GoalAddTaskCard
+                subGoalId={selectedSubGoalId}
+                onClose={() => {
+                  setShowAddTaskCard(false);
+                  setSelectedSubGoalId(null);
+                }}
+                onSave={() => {
+                  setShowAddTaskCard(false);
+                }}
+              />
+            )}
+          </div>
+        ))}
 
         {isAddingSubGoal ? (
           <div className="border rounded-lg p-3 mb-2">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { CalendarSync, Check } from "lucide-react";
@@ -8,12 +8,17 @@ import { Task } from "@/lib/types";
 import { PriorityPopover } from "./priority-popover";
 import { DatePopover } from "./date-popover";
 import { GoalSelect } from "./goal-select";
+import { checkPrayerTimesUpdate } from "@/services/prayersApi";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AddTaskCardProps {
   subGoalId: string;
   todayTask?: boolean;
   onClose: () => void;
   onSave?: () => void;
+  selectedPrayerId?: string | null;
+  isInGoalDetails?: boolean;
 }
 
 export function AddTaskCard({
@@ -21,8 +26,11 @@ export function AddTaskCard({
   todayTask = false,
   onClose,
   onSave,
+  selectedPrayerId = null,
+  isInGoalDetails = false,
 }: AddTaskCardProps) {
   const { addTask } = useTaskContext();
+  const [prayers, setPrayers] = useState<{ id: string; name: string; time: string }[]>([]);
   const [newTask, setNewTask] = useState<Task>({
     id: crypto.randomUUID(),
     name: "",
@@ -31,11 +39,25 @@ export function AddTaskCard({
     date: new Date().toISOString().split("T")[0],
     // Use the field names as defined in your serializer
     sub_goal: subGoalId,
-    prayer: null,
+    prayer: selectedPrayerId,
     priority: "Low",
     status: false,
     repeat: false,
   });
+
+  // Fetch prayer times
+  useEffect(() => {
+    const loadPrayerTimes = async () => {
+      try {
+        const data = await checkPrayerTimesUpdate();
+        setPrayers(data);
+      } catch (error) {
+        console.error("Failed to fetch prayers:", error);
+      }
+    };
+
+    loadPrayerTimes();
+  }, []);
 
   const handleChange = (field: string, value: any) => {
     setNewTask((prev) => ({ ...prev, [field]: value }));
@@ -55,6 +77,10 @@ export function AddTaskCard({
     handleChange("sub_goal", subGoalId);
   };
 
+  const handlePrayerChange = (prayerId: string) => {
+    handleChange("prayer", prayerId === "none" ? null : prayerId);
+  };
+
   const handleSave = () => {
     if (!newTask.name.trim()) return;
     addTask(newTask);
@@ -63,87 +89,95 @@ export function AddTaskCard({
   };
 
   return (
-    <Card className="w-full p-0 bg-card/50 border-white/20 shadow-none mt-2 rounded-lg">
-      <CardContent className="p-2">
-        <input
-          type="text"
-          placeholder="Task Name"
-          className="w-full bg-transparent outline-none font-medium text-md rounded"
-          value={newTask.name}
-          onChange={(e) => handleChange("name", e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          className="w-full bg-transparent outline-none text-xs rounded"
-          value={newTask.description}
-          onChange={(e) => handleChange("description", e.target.value)}
-        />
-        <div className="flex items-center gap-2 mt-2">
-          <DatePopover
-            selectedDate={newTask.date}
-            onDateSelect={handleDateChange}
-          />
-          <PriorityPopover
-            selectedPriority={newTask.priority}
-            onPrioritySelect={handlePriorityChange}
-          />
-          <Button
-            className={`relative shadow-none h-7 !border-white/20 ${
-              newTask.repeat
-                ? "bg-purple-100 text-purple-800 border-purple-300"
-                : ""
-            }`}
-            variant="outline"
-            size="sm"
-            onClick={() => handleChange("repeat", !newTask.repeat)}
-          >
-            <CalendarSync
-              className={`${
-                newTask.repeat ? "text-purple-800" : "text-muted-foreground"
-              } mr-1 h-4 w-4`}
+    <Card className="w-full mt-2">
+      <CardContent className="pt-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="task-name">Task Name</Label>
+            <input
+              id="task-name"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Enter task name"
+              value={newTask.name}
+              onChange={(e) => handleChange("name", e.target.value)}
             />
-            <span>Repeat Task</span>
-          </Button>
-        </div>
-        <div className="flex items-center gap-2 mt-2">
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="task-description">Description (Optional)</Label>
+            <input
+              id="task-description"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Enter task description"
+              value={newTask.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Prayer Time</Label>
+            <Select
+              value={newTask.prayer || "none"}
+              onValueChange={handlePrayerChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select prayer time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                {prayers.map((prayer) => (
+                  <SelectItem key={prayer.id} value={prayer.id}>
+                    {prayer.name} ({prayer.time.slice(0, 5)})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Date</Label>
+            <DatePopover
+              selectedDate={newTask.date}
+              onDateSelect={handleDateChange}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Priority</Label>
+            <PriorityPopover
+              selectedPriority={newTask.priority}
+              onPrioritySelect={handlePriorityChange}
+            />
+          </div>
+
+          {!isInGoalDetails && (
+            <div className="flex flex-col gap-2">
+              <Label>Goal</Label>
+              <GoalSelect
+                selectedSubGoalId={newTask.sub_goal}
+                onSubGoalSelect={handleSubGoalChange}
+              />
+            </div>
+          )}
+
           <div className="flex items-center space-x-2">
             <Switch
-              checked={newTask.status}
-              onCheckedChange={() => handleChange("status", !newTask.status)}
-              id="task-status"
+              id="repeat-task"
+              checked={newTask.repeat}
+              onCheckedChange={(checked) => handleChange("repeat", checked)}
             />
-            <label
-              htmlFor="task-status"
-              className="text-sm cursor-pointer flex items-center"
-            >
-              <Check
-                className={`h-4 w-4 mr-1 ${
-                  newTask.status ? "text-green-500" : "text-muted-foreground"
-                }`}
-              />
-              Mark as completed
-            </label>
+            <Label htmlFor="repeat-task">Repeat daily</Label>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="!p-2 flex justify-between items-center border-t border-white/20">
-        {todayTask ? (
-          <GoalSelect
-            selectedSubGoalId={newTask.sub_goal}
-            onSubGoalSelect={handleSubGoalChange}
-          />
-        ) : (
-          <div></div> // Empty div for spacing when GoalSelect is not shown
-        )}
-        <div className="space-x-2">
-          <Button size="sm" variant="secondary" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button size="sm" onClick={handleSave}>
-            Add Task
-          </Button>
-        </div>
+      <CardFooter className="flex justify-end gap-2">
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave}>
+          <Check className="mr-2 h-4 w-4" />
+          Save
+        </Button>
       </CardFooter>
     </Card>
   );

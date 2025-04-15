@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -18,18 +18,34 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
 import { AddTaskCard } from "@/components/common/task/add-task-card";
+import { useTaskContext } from "@/context/TaskContext";
+import { fetchPrayersApi, checkPrayerTimesUpdate } from "@/services/prayersApi";
+import { SimpleAddTaskCard } from "@/components/common/task/simple-add-task-card";
 
 // Define TypeScript interfaces
 interface Task {
-  id: number;
-  title: string;
-  completed: boolean;
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+  sub_goal: string;
+  prayer: string | null;
+  priority: string;
+  status: boolean;
+  repeat: boolean;
+}
+
+interface Prayer {
+  id: string;
+  name: string;
+  time: string;
 }
 
 interface SubGoal {
   id: number;
   title: string;
   tasks: Task[];
+  prayerId: string | null;
 }
 
 // DnD item type
@@ -39,83 +55,95 @@ const ItemTypes = {
 
 interface DragItem {
   type: string;
-  taskId: number;
+  taskId: string;
   subGoalId: number;
   index: number;
 }
 
 const PrayerListView: React.FC = () => {
-  // Sample data - replace with your actual data
-  const [subGoals, setSubGoals] = useState<SubGoal[]>([
-    {
-      id: 0,
-      title: "Before Fajr",
-      tasks: [
-        { id: 101, title: "Install dependencies", completed: true },
-        {
-          id: 102,
-          title: "Configure development environment",
-          completed: true,
-        },
-        { id: 103, title: "Set up version control", completed: false },
-      ],
-    },
-    {
-      id: 1,
-      title: "Fajr - Dhuhr",
-      tasks: [
-        { id: 101, title: "Install dependencies", completed: true },
-        {
-          id: 102,
-          title: "Configure development environment",
-          completed: true,
-        },
-        { id: 103, title: "Set up version control", completed: false },
-      ],
-    },
-    {
-      id: 2,
-      title: "Dhuhr - Asr",
-      tasks: [
-        { id: 201, title: "Create wireframes", completed: true },
-        { id: 202, title: "Design component library", completed: false },
-        { id: 203, title: "Get design approval", completed: false },
-        { id: 204, title: "Implement responsive design", completed: false },
-      ],
-    },
-    {
-      id: 3,
-      title: "Asr - Maghreb",
-      tasks: [
-        { id: 301, title: "Create user authentication", completed: false },
-        { id: 302, title: "Build dashboard", completed: false },
-        { id: 303, title: "Implement CRUD operations", completed: false },
-      ],
-    },
-    {
-      id: 4,
-      title: "Maghreb - Isha",
-      tasks: [
-        { id: 301, title: "Create user authentication", completed: false },
-        { id: 302, title: "Build dashboard", completed: false },
-        { id: 303, title: "Implement CRUD operations", completed: false },
-      ],
-    },
-    {
-      id: 5,
-      title: "After Isha",
-      tasks: [
-        { id: 301, title: "Create user authentication", completed: false },
-        { id: 302, title: "Build dashboard", completed: false },
-        { id: 303, title: "Implement CRUD operations", completed: false },
-      ],
-    },
-  ]);
-
+  const { tasks, updateTask } = useTaskContext();
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showAddTaskCard, setShowAddTaskCard] = useState(false);
+  const [selectedSubGoalId, setSelectedSubGoalId] = useState<number | null>(null);
+  const [selectedPrayerId, setSelectedPrayerId] = useState<string | null>(null);
 
   // State to track which subgoals are expanded
   const [openItems, setOpenItems] = useState<Record<number, boolean>>({});
+
+  // Fetch prayer times
+  useEffect(() => {
+    const loadPrayerTimes = async () => {
+      try {
+        setIsLoading(true);
+        const data = await checkPrayerTimesUpdate();
+        setPrayers(data);
+      } catch (error) {
+        console.error("Failed to fetch prayers:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPrayerTimes();
+  }, []);
+
+  // Create subgoals based on prayer times
+  const createSubGoals = (): SubGoal[] => {
+    if (!prayers.length) return [];
+
+    // Sort prayers by time
+    const sortedPrayers = [...prayers].sort((a, b) => {
+      const timeA = new Date(`1970-01-01T${a.time}`);
+      const timeB = new Date(`1970-01-01T${b.time}`);
+      return timeA.getTime() - timeB.getTime();
+    });
+
+    // Create subgoals for each prayer time period
+    const subGoals: SubGoal[] = [];
+
+    // Add subgoals between prayers
+    for (let i = 0; i < sortedPrayers.length; i++) {
+      const currentPrayer = sortedPrayers[i];
+      const nextPrayer = sortedPrayers[(i + 1) % sortedPrayers.length];
+      
+      subGoals.push({
+        id: i + 1,
+        title: `${currentPrayer.name} - ${nextPrayer.name}`,
+        tasks: [],
+        prayerId: currentPrayer.id
+      });
+    }
+
+    return subGoals;
+  };
+
+  // Get tasks for each subgoal
+  const getTasksForSubGoal = (subGoal: SubGoal): Task[] => {
+    return tasks.filter(task => {
+      // If task has a prayer ID, it belongs to that prayer's subgoal
+      if (task.prayer && subGoal.prayerId) {
+        return task.prayer === subGoal.prayerId;
+      }
+      return false;
+    });
+  };
+
+  // Initialize subgoals with tasks
+  const [subGoals, setSubGoals] = useState<SubGoal[]>([]);
+
+  // Update subgoals when prayers or tasks change
+  useEffect(() => {
+    const newSubGoals = createSubGoals();
+    
+    // Add tasks to each subgoal
+    const subGoalsWithTasks = newSubGoals.map(subGoal => ({
+      ...subGoal,
+      tasks: getTasksForSubGoal(subGoal)
+    }));
+    
+    setSubGoals(subGoalsWithTasks);
+  }, [prayers, tasks]);
 
   // Toggle expansion state of a subgoal
   const toggleItem = (id: number) => {
@@ -128,98 +156,41 @@ const PrayerListView: React.FC = () => {
   // Calculate progress percentage for a subgoal
   const calculateProgress = (tasks: Task[]): number => {
     if (tasks.length === 0) return 0;
-    const completedTasks = tasks.filter((task) => task.completed).length;
+    const completedTasks = tasks.filter((task) => task.status).length;
     return Math.round((completedTasks / tasks.length) * 100);
   };
 
   // Toggle task completion status
-  const toggleTaskCompletion = (subGoalId: number, taskId: number) => {
-    setSubGoals((prevSubGoals) =>
-      prevSubGoals.map((subGoal) =>
-        subGoal.id === subGoalId
-          ? {
-              ...subGoal,
-              tasks: subGoal.tasks.map((task) =>
-                task.id === taskId
-                  ? { ...task, completed: !task.completed }
-                  : task
-              ),
-            }
-          : subGoal
-      )
-    );
+  const toggleTaskCompletion = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      const updatedTask = { ...task, status: !task.status };
+      updateTask(updatedTask);
+    }
   };
 
   // Move task between or within subgoals
   const moveTask = (
-    taskId: number,
+    taskId: string,
     sourceSubGoalId: number,
     targetSubGoalId: number,
     sourceIndex?: number,
     targetIndex?: number
   ) => {
-    setSubGoals((prevSubGoals) => {
-      // Find the source and target subgoals
-      const sourceSubGoal = prevSubGoals.find(
-        (sg) => sg.id === sourceSubGoalId
-      );
-      const targetSubGoal = prevSubGoals.find(
-        (sg) => sg.id === targetSubGoalId
-      );
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
 
-      if (!sourceSubGoal || !targetSubGoal) return prevSubGoals;
+    // Find the target subgoal to get its prayer ID
+    const targetSubGoal = subGoals.find(sg => sg.id === targetSubGoalId);
+    if (!targetSubGoal) return;
 
-      // Find the task to move
-      const taskToMove = sourceSubGoal.tasks.find((t) => t.id === taskId);
-      if (!taskToMove) return prevSubGoals;
-
-      // If moving within the same subgoal and we have indices
-      if (
-        sourceSubGoalId === targetSubGoalId &&
-        sourceIndex !== undefined &&
-        targetIndex !== undefined
-      ) {
-        // Create a new array of tasks with the moved task
-        const newTasks = [...sourceSubGoal.tasks];
-        newTasks.splice(sourceIndex, 1); // Remove from source position
-        newTasks.splice(targetIndex, 0, taskToMove); // Insert at target position
-
-        // Return updated subgoals
-        return prevSubGoals.map((subGoal) =>
-          subGoal.id === sourceSubGoalId
-            ? { ...subGoal, tasks: newTasks }
-            : subGoal
-        );
-      }
-      // If moving between different subgoals
-      else if (sourceSubGoalId !== targetSubGoalId) {
-        return prevSubGoals.map((subGoal) => {
-          if (subGoal.id === sourceSubGoalId) {
-            return {
-              ...subGoal,
-              tasks: subGoal.tasks.filter((t) => t.id !== taskId),
-            };
-          } else if (subGoal.id === targetSubGoalId) {
-            // If we have a targetIndex, insert at that position
-            if (targetIndex !== undefined) {
-              const newTasks = [...subGoal.tasks];
-              newTasks.splice(targetIndex, 0, taskToMove);
-              return { ...subGoal, tasks: newTasks };
-            }
-            // Otherwise just append to the end
-            else {
-              return {
-                ...subGoal,
-                tasks: [...subGoal.tasks, taskToMove],
-              };
-            }
-          }
-          return subGoal;
-        });
-      }
-
-      return prevSubGoals;
-    });
+    // Update the task with the new prayer ID
+    const updatedTask = { 
+      ...task, 
+      prayer: targetSubGoal.prayerId || null 
+    };
+    
+    updateTask(updatedTask);
   };
 
   // Individual Task component with drag capability
@@ -299,7 +270,7 @@ const PrayerListView: React.FC = () => {
         <Checkbox
           className="rounded-[8px] size-5 border-muted-foreground cursor-pointer"
           id={`task-${task.id}`}
-          checked={task.completed}
+          checked={task.status}
           onCheckedChange={() => toggleCompletion()}
         />
 
@@ -307,11 +278,14 @@ const PrayerListView: React.FC = () => {
           <label
             htmlFor={`task-${task.id}`}
             className={
-              task.completed ? "line-through text-muted-foreground" : ""
+              task.status ? "line-through text-muted-foreground" : ""
             }
           >
-            {task.title}
+            {task.name}
           </label>
+          {task.description && (
+            <span className="text-xs text-muted-foreground">{task.description}</span>
+          )}
         </div>
 
         <div className="ml-auto gap-1 items-center group-hover:flex hidden">
@@ -423,22 +397,29 @@ const PrayerListView: React.FC = () => {
                       task={task}
                       subGoalId={subGoal.id}
                       index={index}
-                      toggleCompletion={() =>
-                        toggleTaskCompletion(subGoal.id, task.id)
-                      }
+                      toggleCompletion={() => toggleTaskCompletion(task.id)}
                     />
                   ))}
-                  {/* <TaskCard
-                    isCompleted
-                    description="afasd"
-                    task="get my things done"
-                  /> */}
 
-                  {showAddTaskCard ? (
-                    <AddTaskCard subGoalId="" onClose={() => {}} />
+                  {showAddTaskCard && selectedSubGoalId === subGoal.id ? (
+                    <SimpleAddTaskCard
+                      subGoalId={selectedSubGoalId.toString()}
+                      onClose={() => {
+                        setShowAddTaskCard(false);
+                        setSelectedSubGoalId(null);
+                      }}
+                      onSave={() => {
+                        setShowAddTaskCard(false);
+                        // Refresh tasks after adding a new one
+                        fetchTasks();
+                      }}
+                    />
                   ) : (
                     <Button
-                      onClick={() => setShowAddTaskCard(true)}
+                      onClick={() => {
+                        setShowAddTaskCard(true);
+                        setSelectedSubGoalId(subGoal.id);
+                      }}
                       variant={"ghost"}
                       className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
                     >
@@ -448,9 +429,22 @@ const PrayerListView: React.FC = () => {
                   )}
                 </ul>
               ) : (
-                <p className="text-gray-500 text-sm italic py-2">
-                  Drop tasks here
-                </p>
+                <div className="py-4">
+                  <p className="text-gray-500 text-sm italic py-2">
+                    Drop tasks here
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setShowAddTaskCard(true);
+                      setSelectedSubGoalId(subGoal.id);
+                    }}
+                    variant={"ghost"}
+                    className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
+                  >
+                    <CirclePlus className="!size-5" strokeWidth={1} />
+                    <span className="">Add Task</span>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </CollapsibleContent>
@@ -458,6 +452,26 @@ const PrayerListView: React.FC = () => {
       </div>
     );
   };
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(`/api/tasks?subGoalId=${selectedSubGoalId}`);
+      if (response.ok) {
+        const data = await response.json();
+        updateTask(data);
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+      </div>
+    );
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>
