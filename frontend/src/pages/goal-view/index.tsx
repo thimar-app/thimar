@@ -43,9 +43,13 @@ export default function GoalDetails() {
   const [aiTaskDescription, setAiTaskDescription] = useState("");
   const [aiTaskPriority, setAiTaskPriority] = useState("");
   const [aiTaskRepeat, setAiTaskRepeat] = useState("");
+  const [aiTaskPrayerTime, setAiTaskPrayerTime] = useState("");
+  const [aiTaskPrayerContext, setAiTaskPrayerContext] = useState("");
   const [selectedSubGoal, setSelectedSubGoal] = useState("");
   const [taskDate, setTaskDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedPrayerId, setSelectedPrayerId] = useState<string | null>(null);
+  const [previousTaskGenerations, setPreviousTaskGenerations] = useState<any[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<any[]>([]);
 
   // Fetch prayer times on component mount
   useEffect(() => {
@@ -68,6 +72,29 @@ export default function GoalDetails() {
       setCurrentGoal(goal);
     }
   }, [goal]);
+
+  // Fetch completed tasks for the current goal
+  useEffect(() => {
+    if (currentGoal && currentGoal.id) {
+      // Fetch completed tasks for this goal
+      const fetchCompletedTasks = async () => {
+        try {
+          // This is a placeholder - implement according to your API
+          const response = await fetch(`/api/goals/${currentGoal.id}/completed-tasks`);
+          const data = await response.json();
+          setCompletedTasks(data);
+        } catch (error) {
+          console.error("Error fetching completed tasks:", error);
+          setCompletedTasks([]);
+        }
+      };
+      
+      fetchCompletedTasks();
+    }
+    
+    // Return void to satisfy the EffectCallback type
+    return;
+  }, [currentGoal]);
 
   // Show loading state
   if (isLoading) {
@@ -155,15 +182,31 @@ export default function GoalDetails() {
       // The payload to your AI endpoint
       const payload = {
         goal_id: currentGoal.id,
-        goal_name: currentGoal.name,
-        goal_description: currentGoal.description,
+        current_goal: {
+          title: currentGoal.name,
+          description: currentGoal.description,
+          progress: currentGoal.progress
+        },
+        completed_tasks: completedTasks.map((task: any) => ({
+          title: task.name,
+          description: task.description
+        })),
+        previous_generations: previousTaskGenerations,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       };
+      
       const data = await generateNewTaskFromAI(payload);
-      // Suppose data = { name, description, priority, repeat }
-      setAiTaskName(data.name || "Untitled Task");
+      
+      // Update state with the AI-generated task
+      setAiTaskName(data.title || "Untitled Task");
       setAiTaskDescription(data.description || "No Description");
       setAiTaskPriority(data.priority || "Low");
-      setAiTaskRepeat(data.repeat || "No");
+      setAiTaskRepeat(data.repeat ? "Yes" : "No");
+      setAiTaskPrayerTime(data.prayer_time || "");
+      setAiTaskPrayerContext(data.prayer_context || "");
+
+      // Store this generation in the history
+      setPreviousTaskGenerations(prev => [...prev, data]);
 
       setAiTaskDialogOpen(true);
     } catch (err) {
@@ -308,7 +351,7 @@ export default function GoalDetails() {
           disabled={isGenerateButtonLoading || !currentGoal?.sub_goals?.length}
         >
           {isGenerateButtonLoading ? <Loader className="animate-spin" /> : <Sparkles />}
-          Generate Tasks
+          Generate Tasks 
         </Button>
       </section>
 
@@ -333,6 +376,12 @@ export default function GoalDetails() {
         <p className="break-words overflow-hidden text-ellipsis"><strong>DESCRIPTION:</strong> {aiTaskDescription}</p>
         <p className="break-words overflow-hidden text-ellipsis"><strong>PRIORITY:</strong> {aiTaskPriority}</p>
         <p className="break-words overflow-hidden text-ellipsis"><strong>REPEAT:</strong> {aiTaskRepeat}</p>
+        {aiTaskPrayerTime && (
+          <>
+            <p className="break-words overflow-hidden text-ellipsis"><strong>SUGGESTED PRAYER TIME:</strong> {aiTaskPrayerTime}</p>
+            <p className="break-words overflow-hidden text-ellipsis"><strong>PRAYER CONTEXT:</strong> {aiTaskPrayerContext}</p>
+          </>
+        )}
       </div>
       {/* SubGoal and Date Inputs in a flex or grid */}
       <div className="flex flex-col space-y-3">
@@ -382,7 +431,15 @@ export default function GoalDetails() {
                 {prayer.name}
               </option>
             ))}
+            {aiTaskPrayerTime && (
+              <option value={aiTaskPrayerTime.toLowerCase()}>
+                {aiTaskPrayerTime} (AI Suggested)
+              </option>
+            )}
           </select>
+          {aiTaskPrayerContext && (
+            <p className="text-xs text-muted-foreground mt-1">{aiTaskPrayerContext}</p>
+          )}
         </div>
       </div>
     </div>
