@@ -38,7 +38,7 @@ export default function Tasks() {
   // Get goal names for display
   const getGoalName = (subGoalId: string) => {
     const parentGoal = getGoalBySubGoalId(subGoalId);
-    return parentGoal ? parentGoal.name : subGoalId;
+    return parentGoal ? parentGoal.name : "No Goal";
   };
   const uniqueGoals = Array.from(
     new Set(tasks.map((task) => getGoalName(task.sub_goal)))

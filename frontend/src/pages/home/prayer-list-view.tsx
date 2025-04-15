@@ -17,9 +17,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Button } from "@/components/ui/button";
-import { AddTaskCard } from "@/components/common/task/add-task-card";
 import { useTaskContext } from "@/context/TaskContext";
-import { fetchPrayersApi, checkPrayerTimesUpdate } from "@/services/prayersApi";
+import { checkPrayerTimesUpdate } from "@/services/prayersApi";
 import { SimpleAddTaskCard } from "@/components/common/task/simple-add-task-card";
 
 // Define TypeScript interfaces
@@ -66,7 +65,6 @@ const PrayerListView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddTaskCard, setShowAddTaskCard] = useState(false);
   const [selectedSubGoalId, setSelectedSubGoalId] = useState<number | null>(null);
-  const [selectedPrayerId, setSelectedPrayerId] = useState<string | null>(null);
 
   // State to track which subgoals are expanded
   const [openItems, setOpenItems] = useState<Record<number, boolean>>({});
@@ -172,19 +170,14 @@ const PrayerListView: React.FC = () => {
   // Move task between or within subgoals
   const moveTask = (
     taskId: string,
-    sourceSubGoalId: number,
-    targetSubGoalId: number,
-    sourceIndex?: number,
-    targetIndex?: number
+    targetSubGoalId: number
   ) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // Find the target subgoal to get its prayer ID
     const targetSubGoal = subGoals.find(sg => sg.id === targetSubGoalId);
     if (!targetSubGoal) return;
 
-    // Update the task with the new prayer ID
     const updatedTask = { 
       ...task, 
       prayer: targetSubGoal.prayerId || null 
@@ -228,7 +221,7 @@ const PrayerListView: React.FC = () => {
         }
 
         // Time to actually perform the action
-        moveTask(item.taskId, item.subGoalId, subGoalId, dragIndex, hoverIndex);
+        moveTask(item.taskId, item.subGoalId);
 
         // Update the index for the dragged item
         item.index = hoverIndex;
@@ -238,9 +231,6 @@ const PrayerListView: React.FC = () => {
         isOver: !!monitor.isOver({ shallow: true }),
       }),
     });
-
-    // Create a ref for the li element
-    const liRef = useRef<HTMLLIElement>(null);
 
     // Connect the drag and drop refs to our li ref
     const connectRef = (element: HTMLLIElement | null) => {
@@ -324,7 +314,7 @@ const PrayerListView: React.FC = () => {
 
         // If dropping on the container itself (not a task), append to end
         if (item.subGoalId !== subGoal.id || item.index === undefined) {
-          moveTask(item.taskId, item.subGoalId, subGoal.id);
+          moveTask(item.taskId, subGoal.id);
         }
       },
       collect: (monitor) => ({

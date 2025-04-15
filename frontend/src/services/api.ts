@@ -69,6 +69,8 @@ export const fetchGoalsApi = async (forceRefresh = false, page = 1, pageSize = 8
 };
 
 export const fetchGoalByIdApi = async (goalId: string) => {
+  console.log(`Fetching goal by ID: ${goalId}`);
+  
   // Check if we have this goal in any cached page
   if (Object.keys(cache.goals).length > 0) {
     // Search through all cached pages for the goal
@@ -77,6 +79,7 @@ export const fetchGoalByIdApi = async (goalId: string) => {
       if (pageData.results) {
         const cachedGoal = pageData.results.find((goal: any) => goal.id === goalId);
         if (cachedGoal) {
+          console.log(`Found goal ${goalId} in cache`);
           return cachedGoal;
         }
       }
@@ -84,13 +87,23 @@ export const fetchGoalByIdApi = async (goalId: string) => {
   }
 
   // If not in cache, fetch from API
-  const response = await axios.get(`${API_BASE_URL}/goals/${goalId}/`, {
-    headers: getAuthHeader(),
-  });
-  
-  // We don't update the cache here as it would require knowing which page the goal is on
-  
-  return response.data;
+  console.log(`Goal ${goalId} not found in cache, fetching from API`);
+  try {
+    const response = await axios.get(`${API_BASE_URL}/goals/${goalId}/`, {
+      headers: getAuthHeader(),
+    });
+    
+    // Cache the fetched goal
+    const goal = response.data;
+    const cacheKey = `goal_${goalId}`;
+    cache.goals[cacheKey] = goal;
+    cache.lastFetch[cacheKey] = Date.now();
+    
+    return goal;
+  } catch (error) {
+    console.error(`Error fetching goal ${goalId}:`, error);
+    throw error;
+  }
 };
 
 export const addGoalApi = async (goal: FormData | any, retryWithFreshToken: unknown, formData: FormData, userId: string, token: string) => {

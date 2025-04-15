@@ -150,7 +150,17 @@ export default function Goals() {
 
   // Handle goal click
   const handleGoalClick = (goal: Goal) => {
+    console.log("Goal clicked:", goal);
+    // Ensure we have a valid goal ID
+    if (!goal || !goal.id) {
+      console.error("Invalid goal object:", goal);
+      return;
+    }
+    
+    // Set the current goal in context
     setCurrentGoal(goal);
+    
+    // Navigate to the goal details page
     navigate(`/goals/${goal.id}`);
   };
 
@@ -240,7 +250,18 @@ export default function Goals() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               {paginatedGoals.map((goal) => (
-                <div key={goal.id} onClick={() => handleGoalClick(goal)}>
+                <div 
+                  key={goal.id} 
+                  onClick={() => handleGoalClick(goal)}
+                  className="cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleGoalClick(goal);
+                    }
+                  }}
+                >
                   <GoalCard
                     title={goal.name}
                     progress={goal.progress}

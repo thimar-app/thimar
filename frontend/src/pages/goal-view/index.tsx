@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import GoalHeader from "./header";
 import { ImageUp, Loader, Sparkles } from "lucide-react";
 import { useGoalContext } from "@/context/GoalContext";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import GoalListView from "./goal-list-view";
+import { useGoalByIdQuery } from "@/services/goalQueries";
+import { useTaskContext } from "@/context/TaskContext";
+import { Task, Priority } from "@/lib/types";
 
 import {
   Dialog,
@@ -16,19 +19,23 @@ import {
 } from "@/components/ui/dialog";
 
 import { generateNewTaskFromAI } from "@/services/aiApi";
-import { createTask } from "@/services/tasksApi";
+import { checkPrayerTimesUpdate } from "@/services/prayersApi";
 
 export default function GoalDetails() {
   const { goalId } = useParams<{ goalId: string }>();
-  const { getGoalById, updateGoal } = useGoalContext();
+  const { updateGoal } = useGoalContext();
+  const { addTask } = useTaskContext();
+  
+  // Use the query hook for proper goal fetching
+  const { data: goal, isLoading, error, refetch } = useGoalByIdQuery(goalId || "");
 
   const [isGenerateButtonLoading, setIsGenerateButtonLoading] = useState(false);
-
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [currentGoal, setCurrentGoal] = useState<any>(null);
+  const [prayers, setPrayers] = useState<{ id: string; name: string; time: string }[]>([]);
 
   // AI-based task creation states
   const [aiTaskDialogOpen, setAiTaskDialogOpen] = useState(false);
@@ -36,13 +43,23 @@ export default function GoalDetails() {
   const [aiTaskDescription, setAiTaskDescription] = useState("");
   const [aiTaskPriority, setAiTaskPriority] = useState("");
   const [aiTaskRepeat, setAiTaskRepeat] = useState("");
-
-  // The user chooses which sub-goal (UUID) to attach the new task
   const [selectedSubGoal, setSelectedSubGoal] = useState("");
-  // The user or system sets a date, defaulting to today
   const [taskDate, setTaskDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedPrayerId, setSelectedPrayerId] = useState<string | null>(null);
 
-  const goal = goalId ? getGoalById(goalId) : undefined;
+  // Fetch prayer times on component mount
+  useEffect(() => {
+    const loadPrayerTimes = async () => {
+      try {
+        const data = await checkPrayerTimesUpdate();
+        setPrayers(data);
+      } catch (error) {
+        console.error("Failed to fetch prayers:", error);
+      }
+    };
+
+    loadPrayerTimes();
+  }, []);
 
   useEffect(() => {
     if (goal) {
@@ -50,17 +67,43 @@ export default function GoalDetails() {
       setDescription(goal.description || "");
       setCurrentGoal(goal);
     }
-  }, [goal?.name, goal?.description, goalId]);
+  }, [goal]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !goal) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="text-red-500">Failed to load goal details</p>
+        <Button onClick={() => window.history.back()}>Go Back</Button>
+      </div>
+    );
+  }
 
   // Inline editing for goal name
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
+  
   const handleTitleBlur = async () => {
     if (goal && title.trim() !== goal.name) {
       const updatedGoal = { ...goal, name: title };
       setCurrentGoal(updatedGoal);
-      await updateGoal(updatedGoal);
+      try {
+        await updateGoal(updatedGoal);
+        setIsEditingTitle(false);
+      } catch (error) {
+        console.error("Error updating goal title:", error);
+      }
+    } else {
       setIsEditingTitle(false);
     }
   };
@@ -69,11 +112,18 @@ export default function GoalDetails() {
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value);
   };
+  
   const handleDescriptionBlur = async () => {
     if (goal && description.trim() !== goal.description) {
       const updatedGoal = { ...goal, description };
       setCurrentGoal(updatedGoal);
-      await updateGoal(updatedGoal);
+      try {
+        await updateGoal(updatedGoal);
+        setIsEditingDescription(false);
+      } catch (error) {
+        console.error("Error updating goal description:", error);
+      }
+    } else {
       setIsEditingDescription(false);
     }
   };
@@ -82,13 +132,15 @@ export default function GoalDetails() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && goal) {
-      // Create a FormData object to send the file
       const formData = new FormData();
       formData.append('image', file);
       formData.append('id', goal.id);
       
-      // Update the goal with the image file
-      updateGoal(formData);
+      try {
+        updateGoal(formData);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
   };
 
@@ -129,24 +181,28 @@ export default function GoalDetails() {
       return;
     }
 
-    // Because sub_goal is a UUID, we do NOT parse it to an integer
-    // We just pass the string
-    const newTaskData = {
+    // Create task data in the correct format
+    const newTaskData: Task = {
+      id: crypto.randomUUID(), // Generate a temporary ID
       name: aiTaskName,
       description: aiTaskDescription,
       date: taskDate,      
-      sub_goal: selectedSubGoal,  // e.g. "3e8cd9f0-726c-4b9e-b029-329c56fb8b63"
-      priority: aiTaskPriority,
-      repeat: aiTaskRepeat
+      sub_goal: selectedSubGoal,
+      prayer: selectedPrayerId,
+      priority: aiTaskPriority as Priority,
+      status: false,
+      repeat: aiTaskRepeat === "Yes"
     };
 
     try {
-      const result = await createTask(newTaskData);
-      console.log("Created task:", result);
+      // Use the TaskContext to add the task
+      await addTask(newTaskData);
+      
+      // Refresh the goal data to show the new task
+      await refetch();
 
       alert("Task created successfully!");
       setAiTaskDialogOpen(false);
-      // Possibly re-fetch tasks or update local state
     } catch (error) {
       console.error("Failed to create task:", error);
       alert("Error creating the new task. See console for details.");
@@ -157,10 +213,6 @@ export default function GoalDetails() {
     setAiTaskDialogOpen(false);
     await handleGenerateTask();
   };
-
-  if (!goal) {
-    return <Navigate to="/goals" replace />;
-  }
 
   return (
     <main className="flex flex-col">
@@ -312,6 +364,25 @@ export default function GoalDetails() {
             value={taskDate}
             onChange={(e) => setTaskDate(e.target.value)}
           />
+        </div>
+        {/* Prayer time select */}
+        <div className="flex flex-col">
+          <label htmlFor="prayer-time-select" className="font-medium mb-1">
+            Prayer Time:
+          </label>
+          <select
+            id="prayer-time-select"
+            className="border rounded px-2 py-2 text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full"
+            value={selectedPrayerId || ""}
+            onChange={(e) => setSelectedPrayerId(e.target.value || null)}
+          >
+            <option value="">-- Select Prayer Time --</option>
+            {prayers.map((prayer) => (
+              <option key={prayer.id} value={prayer.id}>
+                {prayer.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </div>
