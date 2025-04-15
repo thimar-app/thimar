@@ -23,7 +23,7 @@ export type Goal = {
   id: string;
   name: string;
   description: string;
-  image: string;
+  image_url: string;
   progress: number;
   user_id: string;
   subGoals: SubGoal[];
@@ -33,7 +33,7 @@ export type Goals = {
   id: string;
   name: string;
   description: string;
-  image: string;
+  image_url: string;
   progress: number;
   user_id: string;
   subGoals: SubGoal[];

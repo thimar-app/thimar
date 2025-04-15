@@ -1,3 +1,11 @@
+import { Routes, Route } from "react-router-dom";
+import Layout from "@/components/layouts/main-layout";
+import Home from "@/pages/home";
+import Goals from "@/pages/goals";
+import GoalDetails from "@/pages/goal-view";
+import Tasks from "./pages/tasks";
+import { GoalProvider } from "./context/GoalContext";
+import Pomodoro from "@/pages/pomodoro";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import React from 'react';

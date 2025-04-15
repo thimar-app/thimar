@@ -47,11 +47,12 @@
 //   return calculateTaskProgress(subGoal.tasks);
 // };
 
+import { Task } from "@/lib/types";
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-import { Task } from "@/db/goals";
-
-export function cn(...classes: string[]): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 export interface TaskProgress {
@@ -62,7 +63,7 @@ export interface TaskProgress {
 export function calculateTaskProgress(tasks: Task[]): TaskProgress {
   const total = tasks.length;
   if (total === 0) return { percentage: 0, formattedPercentage: "0%" };
-  const completed = tasks.filter(task => task.status).length;
+  const completed = tasks.filter((task) => task.status).length;
   const percentage = (completed / total) * 100;
   return {
     percentage,

@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { calculateTaskProgress } from "@/lib/utils";
-import { Task } from "@/db/goals";
+import { Task } from "@/lib/types";
 
 interface TaskProgress {
   percentage: number;

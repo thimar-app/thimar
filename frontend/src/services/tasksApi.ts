@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Task } from "@/db/goals"; // Ensure your Task interface matches your model
+import { Task } from "@/lib/types"; // Ensure your Task interface matches your model
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -24,9 +24,13 @@ export const addTaskApi = async (task: Task): Promise<Task> => {
 };
 
 export const updateTaskApi = async (task: Task): Promise<Task> => {
-  const response = await axios.patch(`${API_BASE_URL}/tasks/${task.id}/`, task, {
-    headers: getAuthHeader(),
-  });
+  const response = await axios.patch(
+    `${API_BASE_URL}/tasks/${task.id}/`,
+    task,
+    {
+      headers: getAuthHeader(),
+    }
+  );
   return response.data;
 };
 
@@ -34,7 +38,6 @@ export const deleteTaskApi = async (taskId: string): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/tasks/${taskId}/`, {
     headers: getAuthHeader(),
   });
-  
 };
 
 export async function createTask(taskData: any) {
@@ -47,4 +50,3 @@ export async function createTask(taskData: any) {
   });
   return response.data; // The created task object
 }
-
