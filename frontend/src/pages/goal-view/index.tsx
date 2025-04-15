@@ -253,7 +253,7 @@ export default function GoalDetails() {
         <Button
           className="!px-12 h-12 bg-violet-600 rounded-lg"
           onClick={handleGenerateTask}
-          disabled={isGenerateButtonLoading}
+          disabled={isGenerateButtonLoading || !currentGoal?.sub_goals?.length}
         >
           {isGenerateButtonLoading ? <Loader className="animate-spin" /> : <Sparkles />}
           Generate Tasks

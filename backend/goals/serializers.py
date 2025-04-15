@@ -3,7 +3,6 @@ from rest_framework import serializers
 from tasks.serializers import TaskSerializer
 from .models import Goal
 from .models import SubGoal
-import cloudinary
 from .utils.supabase_storage import upload_image, delete_image
 
 #sub-goals/serializers.py

@@ -16,7 +16,7 @@ import { ProfileActions } from "@/components/layouts/sidebar/profile-actions";
 import { useGoalContext } from "@/context/GoalContext";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { goals } = useGoalContext();
+  const { goals = [] } = useGoalContext();
   const location = useLocation();
 
   const goalsList = goals.map((g) => ({

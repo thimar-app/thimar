@@ -103,9 +103,11 @@ import SubGoalItem from "./sub-goal-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CirclePlus } from "lucide-react";
+import { useAddSubGoalMutation } from "@/services/goalQueries";
+import { toast } from "sonner";
 
 interface GoalListViewProps {
-  goal: Goal | null; // Accept null to prevent crashes
+  goal: Goal | null;
   showCompletedTasks: boolean;
 }
 
@@ -115,18 +117,29 @@ const GoalListView: React.FC<GoalListViewProps> = ({
 }) => {
   const [isAddingSubGoal, setIsAddingSubGoal] = useState(false);
   const [newSubGoalName, setNewSubGoalName] = useState("");
-  const { addSubGoal } = useGoalContext();
+  
+  // Use the mutation hook instead of context
+  const addSubGoalMutation = useAddSubGoalMutation(goal?.id || "");
 
   const handleAddSubGoal = async () => {
-    if (!goal) return; // Prevent errors if goal is missing
+    if (!goal) return;
     if (newSubGoalName.trim()) {
-      const newSubGoal = {
-        name: newSubGoalName,
-        goal: goal.id,
-      };
-      await addSubGoal(newSubGoal);
-      setNewSubGoalName("");
-      setIsAddingSubGoal(false);
+      try {
+        await addSubGoalMutation.mutateAsync({
+          name: newSubGoalName,
+          goal: goal.id,
+        });
+        
+        // Reset form state
+        setNewSubGoalName("");
+        setIsAddingSubGoal(false);
+        
+        // Show success message
+        toast.success("Sub-goal added successfully");
+      } catch (error) {
+        console.error('Error creating subgoal:', error);
+        toast.error("Failed to add sub-goal");
+      }
     }
   };
 
@@ -138,7 +151,7 @@ const GoalListView: React.FC<GoalListViewProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full">
+      <div className="w-full flex flex-col">
         {goal?.sub_goals?.length ? (
           goal.sub_goals.map((subGoal: SubGoal, index: number) => (
             <SubGoalItem
@@ -178,7 +191,7 @@ const GoalListView: React.FC<GoalListViewProps> = ({
         ) : (
           <Button
             variant="ghost"
-            className="px-3 gap-3 text-muted-foreground w-full cursor-pointer"
+            className="px-3 gap-3 text-muted-foreground w-full justify-start cursor-pointer"
             onClick={() => setIsAddingSubGoal(true)}
           >
             <CirclePlus size={18} />

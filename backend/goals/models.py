@@ -1,7 +1,6 @@
 import uuid
 from django.db import models
 from django.conf import settings
-from cloudinary.models import CloudinaryField
 
 class Goal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -13,7 +12,6 @@ class Goal(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     # image = models.ImageField(upload_to="goals/images/", blank=True, null=True)
-    # image = CloudinaryField('image', blank=True, null=True) 
     image_url = models.URLField(blank=True, null=True)
     # Optional: store the image path in Supabase storage
     image_path = models.CharField(max_length=255, blank=True, null=True)

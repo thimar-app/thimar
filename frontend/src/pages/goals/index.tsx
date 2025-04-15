@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import React from 'react';
 
 import GoalsHeader from "./header";
-import { CirclePlus, Loader, Sparkles, TrendingUp } from "lucide-react";
+import { CirclePlus, Loader, Sparkles, TrendingUp, ChevronLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import GoalCard from "../../components/common/goal/goal-card";
 import { useGoalContext } from "@/context/GoalContext";
 import {
@@ -15,246 +18,316 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import { generateNewGoalFromAI } from "@/services/aiApi"; // <-- NEW import
+import { generateNewGoalFromAI } from "@/services/aiApi";
 import AddGoalDialog from "@/components/common/goal/add-goal-dialog";
+import { useGoalsQuery, useAllGoalsQuery, PaginatedResponse } from "@/services/goalQueries";
+import { GoalSkeletonGrid } from "@/components/common/goal/goal-skeleton";
+import { LoadingIndicator } from '../../components/ui/loading-indicator';
+import { Goal } from '@/types/goal';
+import { useQueryClient } from "@tanstack/react-query";
+
+// Constants
+const PAGE_SIZE = 8;
+const MAX_AI_ATTEMPTS = 10;
+const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
 
 export default function Goals() {
-  const { goals, addGoal, calculateOverallProgress } = useGoalContext();
+  const { addGoal, currentGoal, setCurrentGoal, calculateOverallProgress } = useGoalContext();
   const [isGenerateButtonLoading, setIsGenerateButtonLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
-  const [progress, setProgress] = useState(0);
+  // Fetch paginated goals and all goals for progress calculation
+  const { 
+    goals: paginatedGoals, 
+    isLoading: isLoadingPaginated,
+    pagination
+  } = useGoalsQuery(currentPage, PAGE_SIZE);
+
+  const { 
+    goals: allGoalsData, 
+    isLoading: isLoadingAll
+  } = useAllGoalsQuery();
 
   // AI-based generation states
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [aiGeneratedGoal, setAiGeneratedGoal] = useState<string>("");
 
-  const [aiGoalName, setAiGoalName] = useState<string>("");
-  const [aiGoalDesc, setAiGoalDesc] = useState<string>("");
-  // Attempt-limiting constants
-  const MAX_ATTEMPTS = 10;
-  const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const overall = calculateOverallProgress();
-    setProgress(overall);
-  }, [goals, calculateOverallProgress]);
+  // Calculate overall progress
+  const overallProgress = React.useMemo(() => {
+    if (!allGoalsData || !Array.isArray(allGoalsData)) return 0;
+    return calculateOverallProgress(allGoalsData);
+  }, [allGoalsData, calculateOverallProgress]);
 
-  // AI Generation logic
-  const handleGenerateGoal = async () => {
-    setIsGenerateButtonLoading(true);
-    // Check attempts in localStorage
-    const storedData = localStorage.getItem("aiGoalAttempts");
-    let attemptsObj = {
-      count: 0,
-      lastReset: Date.now(),
-    };
-    if (storedData) {
-      attemptsObj = JSON.parse(storedData);
+  // Handle page navigation
+  const handlePageChange = (newPage: number) => {
+    if (pagination) {
+      const totalPages = pagination.totalPages;
+      if (newPage >= 1 && newPage <= totalPages) {
+        setCurrentPage(newPage);
+      }
     }
+  };
 
-    const now = Date.now();
-    // If it's been >6 hours since lastReset, reset attempts
-    if (now - attemptsObj.lastReset > SIX_HOURS_MS) {
-      attemptsObj.count = 0;
-      attemptsObj.lastReset = now;
-    }
-
-    if (attemptsObj.count >= MAX_ATTEMPTS) {
-      alert(
-        `You have used all ${MAX_ATTEMPTS} AI attempts for the next 6 hours!`
-      );
-      return;
-    }
-
+  // Handle refresh
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
     try {
-      // Build the "existing_goals" array
-      const existingGoals = goals.map((g) => ({
-        name: g.name,
-        progress: g.progress,
-        description: g.description,
-      }));
+      // Invalidate all goal-related queries to force a refetch
+      await queryClient.invalidateQueries({ queryKey: ['goals'] });
+      await queryClient.invalidateQueries({ queryKey: ['allGoals'] });
+      await queryClient.invalidateQueries({ queryKey: ['goal'] });
+    } catch (error) {
+      console.error('Error refreshing goals:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
-      // Call the AI service
+  // Handle goal added
+  const handleGoalAdded = (newGoal: Goal) => {
+    // Refresh the goals list
+    handleRefresh();
+  };
 
-      const data = await generateNewGoalFromAI(existingGoals);
+  // Handle generate with AI
+  const handleGenerateWithAI = async () => {
+    setIsGenerateButtonLoading(true);
+    try {
+      // Format existing goals for the API
+      const existingGoals = allGoalsData?.map(goal => ({
+        name: goal.name,
+        description: goal.description,
+        progress: goal.progress
+      })) || [];
 
-      // Suppose data = { goal: "...", description: "..." }
-      const goalTitle = data.goal || "No AI goal name";
-      const goalExplanation = data.description || "No AI description";
-      setAiGoalName(goalTitle);
-      setAiGoalDesc(goalExplanation);
-
-      // If the server returns { goal: "xyz", description: "abc" }:
-      const combinedText = `NEW GOAL: ${data.goal}\n\nDESCRIPTION: ${data.description}`;
-
-      // const aiGoalOutput = data.output || "No data from AI.";
-      setAiGeneratedGoal(combinedText);
+      const response = await generateNewGoalFromAI(existingGoals);
+      // Format the response object into a string
+      const formattedResponse = `Goal: ${response.goal}\n\nDescription: ${response.description}`;
+      setAiGeneratedGoal(formattedResponse);
       setAiDialogOpen(true);
-
-      // Increase attempt count and save
-      attemptsObj.count += 1;
-      localStorage.setItem("aiGoalAttempts", JSON.stringify(attemptsObj));
-      setIsGenerateButtonLoading(false);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to generate AI-based goal. Check console for details.");
+    } catch (error) {
+      console.error('Error generating goal with AI:', error);
     } finally {
       setIsGenerateButtonLoading(false);
     }
   };
 
-  async function fileFromUrl(url: string, fileName: string) {
-    // 1) Fetch the remote image
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch image: ${response.status} ${response.statusText}`
-      );
-    }
-    // 2) Convert response to a Blob
-    const blob = await response.blob();
-    // 3) Turn the Blob into a File (with a given filename)
-    return new File([blob], fileName, { type: blob.type });
-  }
-
-  const handleAcceptGeneratedGoal = async () => {
+  // Handle save generated goal
+  const handleSaveGeneratedGoal = async () => {
     try {
-      // Suppose you have a Cloudinary link for the AI goal's default image
-      const cloudinaryUrl =
-        "https://res.cloudinary.com/dh6yx1sei/image/upload/v1742429727/butmyifqwk0cfvhokmsu.png";
-
-      // 1) Convert the Cloudinary URL into a File object
-      const file = await fileFromUrl(cloudinaryUrl, "ai_goal_image.png");
-
-      // 2) Build FormData for the new goal
+      // Extract goal name and description from the formatted string
+      const goalMatch = aiGeneratedGoal.match(/Goal: (.*?)\n/);
+      const descriptionMatch = aiGeneratedGoal.match(/Description: (.*)/s);
+      
+      if (!goalMatch || !descriptionMatch) {
+        console.error('Could not parse generated goal');
+        return;
+      }
+      
+      const goalName = goalMatch[1].trim();
+      const goalDescription = descriptionMatch[1].trim();
+      
+      // Create form data for the new goal
       const formData = new FormData();
-      formData.append("name", aiGoalName); // from your AI states
-      formData.append("description", aiGoalDesc);
-      formData.append("image", file); // an actual file
-
-      // 3) Use your existing addGoal function that expects FormData
+      formData.append('name', goalName);
+      formData.append('description', goalDescription);
+      formData.append('sub_goals', '[]');
+      
+      // Add the goal using the context function
       await addGoal(formData);
-
-      // 4) Close the dialog
+      
+      // Close the dialog and refresh the goals list
       setAiDialogOpen(false);
+      handleRefresh();
     } catch (error) {
-      console.error("Error accepting AI-generated goal:", error);
-      alert("Failed to accept AI-generated goal.");
+      console.error('Error saving generated goal:', error);
     }
   };
 
-  const handleRegenerateGoal = async () => {
-    setAiDialogOpen(false);
-    await handleGenerateGoal();
+  // Handle goal click
+  const handleGoalClick = (goal: Goal) => {
+    setCurrentGoal(goal);
+    navigate(`/goals/${goal.id}`);
   };
 
   // -------------------------------------
   // The Render
   // -------------------------------------
+  if (isLoadingPaginated || isLoadingAll) {
+    return <GoalSkeletonGrid />;
+  }
+
+  if (!paginatedGoals || !Array.isArray(paginatedGoals) || !allGoalsData || !Array.isArray(allGoalsData)) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        Error loading goals. Please try again later.
+      </div>
+    );
+  }
+
+  const totalPages = pagination?.totalPages || 1;
+
   return (
-    <main className="flex flex-col">
+    <div className="flex flex-col h-full">
       <GoalsHeader />
-
-      {/* Progress Bar Section */}
-      <section className="flex items-center gap-3">
-        <div className="w-full p-4 pb-5 bg-muted rounded-lg flex flex-col items-center justify-center gap-4">
-          <div className="flex justify-between items-center w-full">
-            <h2 className="flex items-center gap-3 font-semibold text-lg">
-              <TrendingUp />
-              Goals Progress
-            </h2>
-            <span className="font-semibold text-lg text-muted-foreground">
-              {Math.floor(progress)}%
-            </span>
-          </div>
-          <div className="w-full h-3 rounded-full bg-muted-foreground/30">
-            <div
-              className="bg-violet-600 h-3 rounded-full transition-all duration-300 ease-in-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col w-max items-center gap-3">
-          <Button
-            className="!px-8 bg-violet-600 h-10"
-            onClick={handleGenerateGoal}
-            disabled={isGenerateButtonLoading}
-          >
-            {isGenerateButtonLoading ? (
-              <Loader className="animate-spin" />
-            ) : (
-              <Sparkles />
-            )}
-            Generate Goal
-          </Button>
-
-          {/* "Add Goal" dialog (manual) */}
-          <AddGoalDialog>
-            <Button
-              variant="ghost"
-              className="gap-3 bg-card w-full cursor-pointer h-10"
+      <div className="flex-1 overflow-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Goals</h1>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="ml-2"
             >
-              <CirclePlus className="!size-5" strokeWidth={1} />
-              <span>Add Goal</span>
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
-          </AddGoalDialog>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleGenerateWithAI}
+              disabled={isGenerateButtonLoading}
+            >
+              {isGenerateButtonLoading ? (
+                <Loader className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-2 h-4 w-4" />
+              )}
+              Generate with AI
+            </Button>
+            <AddGoalDialog>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Goal
+              </Button>
+            </AddGoalDialog>
+          </div>
         </div>
-      </section>
 
-      {/* AI-Generated Goal Dialog */}
+        {/* Progress Card */}
+        <Card className="p-4 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-medium">Overall Progress</h2>
+            <span className="text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
+          </div>
+          <Progress value={overallProgress} className="h-2" />
+        </Card>
+
+        {/* Goals Grid */}
+        {isLoadingPaginated ? (
+          <GoalSkeletonGrid />
+        ) : paginatedGoals.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <CirclePlus className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No goals yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Create your first goal to start tracking your progress
+            </p>
+            <AddGoalDialog>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Goal
+              </Button>
+            </AddGoalDialog>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {paginatedGoals.map((goal) => (
+                <div key={goal.id} onClick={() => handleGoalClick(goal)}>
+                  <GoalCard
+                    title={goal.name}
+                    progress={goal.progress}
+                    image_url={goal.image_url}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!pagination.hasPreviousPage}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm">
+                  Page {currentPage} of {pagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* AI Dialog */}
       <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-        <DialogContent className="max-w-[600px]">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>AI-Generated Goal</DialogTitle>
+            <DialogTitle>AI-Generated Goal Suggestion</DialogTitle>
             <DialogDescription>
-              A suggested goal from the AI. Accept or regenerate if you have
-              attempts left.
+              Here's a goal suggestion from AI. You can accept it or generate a new one.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <p className="whitespace-pre-line bg-card p-4 rounded-md">
-              {aiGeneratedGoal}
-            </p>
+            <div className="p-4 bg-muted rounded-md">
+              <p className="whitespace-pre-line">{aiGeneratedGoal}</p>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleRegenerateGoal}>
-              Regenerate
+          <DialogFooter className="flex gap-2">
+          <Button 
+              variant="outline" 
+              onClick={() => setAiDialogOpen(false)}
+            >
+              Close
             </Button>
             <Button
-              className="bg-violet-600"
-              onClick={handleAcceptGeneratedGoal}
+              variant="outline"
+              onClick={handleGenerateWithAI}
+              disabled={isGenerateButtonLoading}
             >
-              Accept
+              {isGenerateButtonLoading ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generate New
+                </>
+              )}
+            </Button>
+
+            <Button 
+              variant="default"
+              onClick={handleSaveGeneratedGoal}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Save Goal
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Goals List */}
-      <section className="mt-4">
-        <div className="container mx-auto w-full">
-          {goals.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-lg text-muted-foreground">
-                No goals found. Create a new goal to get started.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {goals.map((goal) => (
-                <Link to={`/goals/${goal.id}`} key={goal.id} className="block">
-                  <GoalCard
-                    progress={goal.progress}
-                    title={goal.name}
-                    image_url={goal.image_url}
-                  />
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    </main>
+    </div>
   );
 }

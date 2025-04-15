@@ -69,8 +69,8 @@ export function NavGoals({
                   {showMore && goals.length > 6 && (
                     <SidebarMenuSubItem>
                       <Link to={`/goals`} className="block">
-                        <SidebarMenuSubButton>
-                          <Ellipsis /> More
+                        <SidebarMenuSubButton asChild>
+                          <span><Ellipsis /> More</span>
                         </SidebarMenuSubButton>
                       </Link>
                     </SidebarMenuSubItem>

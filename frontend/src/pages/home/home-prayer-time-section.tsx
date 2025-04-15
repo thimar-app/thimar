@@ -1,20 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-
-const getAuthHeader = () => {
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2OTk2MzM1LCJpYXQiOjE3NDQ1NzcxMzUsImp0aSI6IjU1ODI4YjcyYjIwZjQ2Y2Y4MzQxNzE0MjlkMTYyODlhIiwidXNlcl9pZCI6N30.fzgD3HZp4HrvjxiEjx4Oe14TlIWD9WlpiiWw286nnGc";
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const fetchPrayersApi = async () => {
-  const response = await axios.get(`${API_BASE_URL}/prayers/`, {
-    headers: getAuthHeader(),
-  });
-  return response.data; // your array of prayers
-};
+import { fetchPrayersApi, checkPrayerTimesUpdate } from "@/services/prayersApi";
 
 export default function HomePrayerTimeSection() {
   interface Prayer {
@@ -26,16 +11,23 @@ export default function HomePrayerTimeSection() {
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [nextPrayerName, setNextPrayerName] = useState("");
   const [timeUntilNextPrayer, setTimeUntilNextPrayer] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const loadPrayerTimes = async () => {
       try {
-        const data = await fetchPrayersApi();
+        setIsLoading(true);
+        // First try to get cached data
+        const data = await checkPrayerTimesUpdate();
         setPrayers(data);
       } catch (error) {
         console.error("Failed to fetch prayers:", error);
+      } finally {
+        setIsLoading(false);
       }
-    })();
+    };
+
+    loadPrayerTimes();
   }, []);
 
   // -------------
@@ -66,7 +58,6 @@ export default function HomePrayerTimeSection() {
     let upcoming = prayersToday.find((p) => p.dateObj > now);
 
     // If all prayers have passed, we treat the first one as "tomorrow".
-    // This is just one approach; you can adapt to your needs.
     if (!upcoming) {
       upcoming = { ...prayersToday[0] };
       // add 1 day
@@ -99,6 +90,19 @@ export default function HomePrayerTimeSection() {
   const style = {
     background: `conic-gradient(#7c3aed ${degrees}deg, #fff 0deg)`,
   };
+
+  if (isLoading) {
+    return (
+      <section className="flex items-center gap-4">
+        <div className="w-full h-72 bg-muted rounded-lg flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+        </div>
+        <div className="min-w-72 h-72 bg-muted rounded-lg flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="flex items-center gap-4">

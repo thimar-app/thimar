@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoalContext } from '../context/GoalContext';
-import { useAuth } from '@clerk/clerk-react';
 import { useAuthAxios } from '../hooks/useAuthAxios';
 import { addGoalApi } from '../services/api';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 const AddGoalForm: React.FC = () => {
   const navigate = useNavigate();
   const { addGoal } = useGoalContext();
-  const { userId } = useAuth();
   const { authAxios, retryWithFreshToken, isReady, createAxiosInstance } = useAuthAxios();
-  const { getSupabaseToken } = useSupabaseAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -20,10 +16,6 @@ const AddGoalForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) {
-      setError('Please sign in to add a goal');
-      return;
-    }
     if (!isReady) {
       setError('Please wait while we initialize...');
       return;
@@ -40,18 +32,12 @@ const AddGoalForm: React.FC = () => {
         formData.append('image', image);
       }
 
-      const token = await getSupabaseToken();
-      if (!token) {
-        throw new Error('No token available for Supabase operations');
-      }
-
-      // Ensure we have an axios instance
       const axiosInstance = authAxios || await createAxiosInstance();
       if (!axiosInstance) {
         throw new Error('Failed to initialize API client');
       }
 
-      const newGoal = await addGoalApi(axiosInstance, retryWithFreshToken, formData, userId, token);
+      const newGoal = await addGoalApi(axiosInstance, retryWithFreshToken, formData, "", "");
       addGoal(newGoal);
       navigate('/goals');
     } catch (err) {

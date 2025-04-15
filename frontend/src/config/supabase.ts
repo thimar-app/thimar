@@ -24,10 +24,11 @@ export const setSupabaseAccessToken = (token: string) => {
     return;
   }
   
-  supabase.rest.headers = {
-    ...supabase.rest.headers,
-    'Authorization': `Bearer ${token}`
-  };
+  // Use the proper method to set headers
+  supabase.auth.setSession({
+    access_token: token,
+    refresh_token: ''
+  });
 };
 
 // Helper function to get the storage bucket
