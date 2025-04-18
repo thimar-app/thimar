@@ -1,1 +1,1 @@
-cd backend && daphne thimar_project.wsgi
+web: cd backend && pipenv run daphne thimar_project.asgi:application

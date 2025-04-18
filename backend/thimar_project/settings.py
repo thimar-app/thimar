@@ -37,6 +37,7 @@ DEBUG = os.getenv('DEBUG', default=False)
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALLOWED_HOSTS = ['*']  # or better: ['yourapp.up.railway.app']
 # SECURITY WARNING: don't run with debug turned on in production!
+PORT = os.getenv("PORT", "8000")
 
 CORS_ALLOW_ALL_ORIGINS = True
 
