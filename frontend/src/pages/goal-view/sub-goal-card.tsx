@@ -17,11 +17,24 @@ import {
   Save,
   X,
   PenLine,
+  Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ItemTypes } from "./item-types";
 import TaskCardDraggable from "@/components/common/task/task-card-draggable";
 import { GoalAddTaskCard } from "@/components/common/task/goal-add-task-card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface SubGoalItemProps {
   subGoal: {
@@ -48,7 +61,7 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
   const [subGoalTitle, setSubGoalTitle] = useState(subGoal.name);
   const ref = useRef<HTMLDivElement>(null);
 
-  const { moveSubGoal, updateSubGoal } = useGoalContext();
+  const { moveSubGoal, updateSubGoal, deleteSubGoal } = useGoalContext();
   const {
     tasks,
     toggleTaskStatus,
@@ -64,10 +77,15 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
     ? subGoalTasks
     : subGoalTasks.filter((task) => !task.status);
 
-  const handleSaveTitle = () => {
-    const updatedSubGoal = { ...subGoal, name: subGoalTitle };
-    updateSubGoal(updatedSubGoal);
-    setIsEditingTitle(false);
+  const handleSaveTitle = async () => {
+    try {
+      const updatedSubGoal = { ...subGoal, name: subGoalTitle };
+      await updateSubGoal(updatedSubGoal);
+      setIsEditingTitle(false);
+      // No need to refresh data, Supabase Realtime will handle it
+    } catch (error) {
+      console.error("Error updating sub-goal title:", error);
+    }
   };
 
   const handleEditTask = (task: any) => {
@@ -112,6 +130,17 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
   });
 
   drag(drop(dropTask(ref)));
+
+  const handleDeleteSubGoal = async () => {
+    try {
+      await deleteSubGoal(subGoal.id);
+      toast.success("Sub-goal deleted successfully");
+      // No need to refresh data, Supabase Realtime will handle it
+    } catch (error) {
+      console.error("Error deleting sub-goal:", error);
+      toast.error("Failed to delete sub-goal");
+    }
+  };
 
   return (
     <div
@@ -165,17 +194,54 @@ const SubGoalItem: React.FC<SubGoalItemProps> = ({
                   ({filteredTasks.length} tasks)
                 </span>
               </CollapsibleTrigger>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="group-hover/coll:flex hidden size-6 text-muted-foreground"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsEditingTitle(true);
-                }}
-              >
-                <PenLine className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="size-6 text-muted-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditingTitle(true);
+                  }}
+                >
+                  <PenLine className="h-4 w-4" />
+                </Button>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-6 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Sub-Goal</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{subGoal.name}"? This action cannot be undone.
+                        {filteredTasks.length > 0 && (
+                          <span className="block mt-2 text-destructive">
+                            Warning: This sub-goal contains {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''}.
+                          </span>
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteSubGoal}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </>
           )}
         </div>

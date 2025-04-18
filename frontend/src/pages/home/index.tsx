@@ -112,8 +112,8 @@ export default function Home() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black opacity-60"></div>
           {/* Dialog container */}
-          <div className="relative bg-white rounded-lg shadow-2xl max-w-md w-full p-8 mx-4 transform transition-all duration-300 scale-100">
-            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          <div className="relative bg-gray-800  rounded-lg shadow-2xl max-w-md w-full p-8 mx-4 transform transition-all duration-300 scale-100">
+            <h2 className="text-2xl font-bold mb-4 text-center text-white">
               Today's Barakah
             </h2>
             <div className="space-y-4">
@@ -121,12 +121,12 @@ export default function Home() {
                 <p className="text-gray-800 text-lg text-center font-medium">{baraqahMessage}</p>
               </div>
               {baraqahSource && (
-                <p className="text-gray-600 text-sm italic text-center">
+                <p className="text-white text-sm italic text-center">
                   <span className="font-semibold">Source:</span> {baraqahSource}
                 </p>
               )}
               {baraqahExplanation && (
-                <p className="text-gray-600 text-sm text-center">
+                <p className="text-white text-sm text-center">
                   <span className="font-semibold">Explanation:</span> {baraqahExplanation}
                 </p>
               )}

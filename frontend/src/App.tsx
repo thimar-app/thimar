@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import React from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { GoalProvider } from "./context/GoalContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Layout from "./components/layouts/main-layout";
@@ -11,31 +12,8 @@ import Goals from "./pages/goals";
 import GoalDetails from "./pages/goal-view";
 import Tasks from "./pages/tasks";
 import Pomodoro from "./pages/pomodoro";
-
-// const App = () => {
-//   return (
-//     <GoalProvider>
-//       <Router>
-      
-//         <Layout>
-//           <Routes>
-//             <Route path="/home" element={<Home />} />
-//             <Route path="/goals" element={<Goals />} />
-//             <Route path="/goals/:goalId" element={<GoalDetails />} />
-//             <Route path="/tasks" element={<Tasks />} />
-//             <Route path="/pomodoro" element={<Pomodoro />} />
-//           </Routes>
-//         </Layout>
-//       </Router>
-//     </GoalProvider>
-//   );
-// };
-
-// export default App;
-
-
-
-
+import Welcome from "./pages/Welcome";
+import { Loading } from "./components/ui/loading";
 
 
 // // Protected route component
@@ -46,12 +24,13 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
+  // Show loading indicator while checking authentication status
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <Loading fullScreen />;
   }
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/welcome" />;
   }
   
   return <>{children}</>;
@@ -59,41 +38,43 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={
-            <AuthLayout>
-              <Login />
-            </AuthLayout>
-          } />
-          <Route path="/register" element={
-            <AuthLayout>
-              <Register />
-            </AuthLayout>
-          } />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <GoalProvider>
-                  <Layout>
-                    <Routes>
-                      <Route path="/home" element={<Home />} />
-                      <Route path="/goals" element={<Goals />} />
-                      <Route path="/goals/:goalId" element={<GoalDetails />} />
-                      <Route path="/tasks" element={<Tasks />} />
-                      <Route path="/pomodoro" element={<Pomodoro />} />
-                    </Routes>
-                  </Layout>
-                </GoalProvider>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/welcome" element={<Welcome />} />
+            <Route path="/login" element={
+              <AuthLayout>
+                <Login />
+              </AuthLayout>
+            } />
+            <Route path="/register" element={
+              <AuthLayout>
+                <Register />
+              </AuthLayout>
+            } />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <GoalProvider>
+                    <Layout>
+                      <Routes>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/goals" element={<Goals />} />
+                        <Route path="/goals/:goalId" element={<GoalDetails />} />
+                        <Route path="/tasks" element={<Tasks />} />
+                        <Route path="/pomodoro" element={<Pomodoro />} />
+                      </Routes>
+                    </Layout>
+                  </GoalProvider>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

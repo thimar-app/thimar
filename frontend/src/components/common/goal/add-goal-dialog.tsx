@@ -26,20 +26,45 @@ function AddGoalDialog({ children }: { children: React.ReactNode }) {
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Don't proceed if name is empty
+    if (!newGoalName.trim()) {
+      // You might want to show an error message to the user here
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", newGoalName);
-    formData.append("description", newGoalDescription);
+    
+    // Only append description if it's not empty
+    if (newGoalDescription.trim()) {
+      formData.append("description", newGoalDescription);
+    }
+    
+    // Only append image if provided
     if (newGoalImage) {
       formData.append("image", newGoalImage, newGoalImage.name);
     }
+    
     formData.append("sub_goals", "[]");
 
-    await addGoal(formData);
-
-    setNewGoalName("");
-    setNewGoalDescription("");
-    setNewGoalImage(null);
-    setOpen(false);
+    try {
+      console.log("Submitting form data:", {
+        name: newGoalName,
+        description: newGoalDescription,
+        image: newGoalImage ? newGoalImage.name : "No image provided (will use backend default)"
+      });
+      
+      await addGoal(formData);
+      
+      // Reset form and close dialog on success
+      setNewGoalName("");
+      setNewGoalDescription("");
+      setNewGoalImage(null);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error adding goal:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   const resetForm = () => {

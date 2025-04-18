@@ -15,6 +15,12 @@ const isCacheValid = (page: number) => {
   return cache.goals[cacheKey] && Date.now() - (cache.lastFetch[cacheKey] || 0) < CACHE_DURATION;
 };
 
+// Helper function to clear all caches
+const clearAllCaches = () => {
+  cache.goals = {};
+  cache.lastFetch = {};
+};
+
 // Helper to convert JSON object to FormData
 const jsonToFormData = (data: any): FormData => {
   const formData = new FormData();
@@ -100,7 +106,25 @@ export const addGoalApi = async (goal: FormData | any, formData: FormData, userI
   // For regular objects, convert to FormData
   const goalData = goal instanceof FormData ? goal : jsonToFormData(goal);
   
-  const response = await api.post('/goals/', goalData);
+  // Create a custom config for the request
+  const config = {
+    // No need to set headers here, the axios interceptor will handle it
+  };
+  
+  // Add user ID and token to the request if provided
+  if (userId) {
+    goalData.append('user', userId);
+  }
+  
+  if (token) {
+    config.headers = {
+      'Authorization': `Bearer ${token}`
+    };
+  }
+  
+  console.log('Sending goal data:', goalData);
+  
+  const response = await api.post('/goals/', goalData, config);
   
   // Invalidate cache to ensure fresh data on next fetch
   cache.goals = {} as Record<string, any>;
@@ -116,7 +140,14 @@ export const updateGoalApi = async (goal: any) => {
       throw new Error('Goal ID is required for update');
     }
     
-    const response = await api.patch(`/goals/${goalId}/`, goal);
+    // Create a custom config for FormData
+    const config = {
+      headers: {
+        // Don't set Content-Type for FormData, let the browser set it with the boundary
+      }
+    };
+    
+    const response = await api.patch(`/goals/${goalId}/`, goal, config);
     
     // Update cache if we have it
     if (Object.keys(cache.goals).length > 0) {
@@ -129,7 +160,14 @@ export const updateGoalApi = async (goal: any) => {
     // For regular JSON objects, convert to FormData
     const goalData = jsonToFormData(goal);
     
-    const response = await api.patch(`/goals/${goal.id}/`, goalData);
+    // Create a custom config for FormData
+    const config = {
+      headers: {
+        // Don't set Content-Type for FormData, let the browser set it with the boundary
+      }
+    };
+    
+    const response = await api.patch(`/goals/${goal.id}/`, goalData, config);
     
     // Update cache if we have it
     if (Object.keys(cache.goals).length > 0) {
@@ -172,13 +210,20 @@ export const addSubGoalApi = async (subGoal: any) => {
   // Log the data being sent to the backend
   console.log('Adding subgoal with data:', subGoal);
   
-  const response = await api.post('/goals/sub-goals/', formData);
+  // Create a custom config for FormData
+  const config = {
+    headers: {
+      // Don't set Content-Type for FormData, let the browser set it with the boundary
+    }
+  };
+  
+  const response = await api.post('/goals/sub-goals/', formData, config);
   
   // Log the response from the backend
   console.log('Subgoal added successfully:', response.data);
   
-  // Invalidate cache to ensure fresh data on next fetch
-  cache.goals = {} as Record<string, any>;
+  // Clear all caches to ensure fresh data
+  clearAllCaches();
   
   return response.data;
 };
@@ -187,31 +232,26 @@ export const updateSubGoalApi = async (subGoal: any) => {
   // Convert to FormData
   const formData = jsonToFormData(subGoal);
   
-  const response = await api.patch(`/sub-goals/${subGoal.id}/`, formData);
+  // Create a custom config for FormData
+  const config = {
+    headers: {
+      // Don't set Content-Type for FormData, let the browser set it with the boundary
+    }
+  };
   
-  // Update cache if we have it
-  if (cache.goals) {
-    cache.goals = cache.goals.map((goal: any) => ({
-      ...goal,
-      sub_goals: goal.sub_goals.map((sg: any) => 
-        sg.id === subGoal.id ? response.data : sg
-      ),
-    }));
-  }
+  const response = await api.patch(`/goals/sub-goals/${subGoal.id}/`, formData, config);
+  
+  // Clear all caches to ensure fresh data
+  clearAllCaches();
   
   return response.data;
 };
 
 export const deleteSubGoalApi = async (subGoalId: string) => {
-  const response = await api.delete(`/sub-goals/${subGoalId}/`);
+  const response = await api.delete(`/goals/sub-goals/${subGoalId}/`);
   
-  // Update cache if we have it
-  if (cache.goals) {
-    cache.goals = cache.goals.map((goal: any) => ({
-      ...goal,
-      sub_goals: goal.sub_goals.filter((sg: any) => sg.id !== subGoalId),
-    }));
-  }
+  // Clear all caches to ensure fresh data
+  clearAllCaches();
   
   return response.data;
 };

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { ProfileActions } from "@/components/layouts/sidebar/profile-actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useGoalContext } from "@/context/GoalContext";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -55,7 +56,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <div className="flex justify-between gap-2 items-center mt-1.5">
           <ProfileActions />
-          <SidebarTrigger />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <SidebarTrigger />
+          </div>
         </div>
         <NavMain items={navItems} />
       </SidebarHeader>

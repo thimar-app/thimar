@@ -14,6 +14,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false
+  },
+  // Enable realtime
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
   }
 });
 

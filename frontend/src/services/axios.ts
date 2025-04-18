@@ -3,9 +3,6 @@ import axios from 'axios';
 // Create axios instance with default config
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
   timeout: 10000, // 10 seconds
 });
 
@@ -18,6 +15,11 @@ api.interceptors.request.use(
     // If token exists, add it to headers
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // If the request is not FormData, set Content-Type to application/json
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json';
     }
     
     return config;
@@ -43,7 +45,7 @@ api.interceptors.response.use(
         // Try to refresh the token
         const refreshToken = localStorage.getItem('refresh_token');
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/auth/token/refresh/`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/token/refresh/`,
           { refresh: refreshToken }
         );
 

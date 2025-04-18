@@ -10,6 +10,7 @@ import {
   deleteSubGoalApi,
 } from "../services/api";
 import { useQueryClient } from "@tanstack/react-query";
+import { subscribeToGoals, subscribeToSubGoals } from "../services/supabaseRealtime";
 
 // Interfaces matching your backend:
 export interface SubGoal {
@@ -50,6 +51,7 @@ interface GoalContextType {
   // Legacy methods for backward compatibility
   getGoalById: (id: string) => Goal | undefined;
   getGoalBySubGoalId: (subGoalId: string) => Goal | undefined;
+  refreshGoals: () => Promise<void>;
 }
 
 const GoalContext = createContext<GoalContextType | undefined>(undefined);
@@ -69,7 +71,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     hasPreviousPage: false,
   });
   const queryClient = useQueryClient();
-
+  
   // Memoized fetch functions to prevent unnecessary re-renders
   const fetchGoals = useCallback(async (forceRefresh = false, page = 1, pageSize = 8) => {
     try {
@@ -136,7 +138,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       setLoading(true);
       setError(null);
-      const newGoal = await addGoalApi(goal, null, goal instanceof FormData ? goal : new FormData(), "", "");
+      const newGoal = await addGoalApi(goal, new FormData(), "", "");
       
       // Invalidate the goals query to refetch the data
       queryClient.invalidateQueries({ queryKey: ['goals'] });
@@ -257,117 +259,90 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     return total / goals.length;
   };
 
+  // Handle real-time goal updates
+  const handleGoalUpdate = useCallback((updatedGoal: Goal) => {
+    console.log('GoalContext: Received real-time goal update:', updatedGoal);
+    
+    // Update the goals list
+    setGoals(prevGoals => 
+      prevGoals.map(goal => 
+        goal.id === updatedGoal.id ? updatedGoal : goal
+      )
+    );
+    
+    // Update currentGoal if it's the one being updated
+    if (currentGoal && currentGoal.id === updatedGoal.id) {
+      setCurrentGoal(updatedGoal);
+    }
+  }, [currentGoal]);
+
+  // Handle real-time sub-goal updates
+  const handleSubGoalUpdate = useCallback((updatedSubGoal: SubGoal) => {
+    console.log('GoalContext: Received real-time sub-goal update:', updatedSubGoal);
+    
+    // Update the goals list
+    setGoals(prevGoals => 
+      prevGoals.map(goal => {
+        if (goal.sub_goals.some(sg => sg.id === updatedSubGoal.id)) {
+          return {
+            ...goal,
+            sub_goals: goal.sub_goals.map(sg => 
+              sg.id === updatedSubGoal.id ? updatedSubGoal : sg
+            )
+          };
+        }
+        return goal;
+      })
+    );
+    
+    // Update currentGoal if it contains the updated sub-goal
+    if (currentGoal && currentGoal.sub_goals.some(sg => sg.id === updatedSubGoal.id)) {
+      setCurrentGoal(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          sub_goals: prev.sub_goals.map(sg => 
+            sg.id === updatedSubGoal.id ? updatedSubGoal : sg
+          )
+        };
+      });
+    }
+  }, [currentGoal]);
+
+  // Set up Supabase Realtime subscriptions
+  useEffect(() => {
+    console.log('GoalContext: Setting up Supabase Realtime subscriptions');
+    
+    // Subscribe to goal updates
+    const unsubscribeGoals = subscribeToGoals(handleGoalUpdate);
+    
+    // Subscribe to sub-goal updates
+    const unsubscribeSubGoals = subscribeToSubGoals(handleSubGoalUpdate);
+    
+    // Clean up subscriptions on unmount
+    return () => {
+      console.log('GoalContext: Cleaning up Supabase Realtime subscriptions');
+      unsubscribeGoals();
+      unsubscribeSubGoals();
+    };
+  }, [handleGoalUpdate, handleSubGoalUpdate]);
+
   const addSubGoal = useCallback(async (subGoal: any) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('GoalContext: Adding subgoal:', subGoal);
-      
-      // Create a temporary ID for optimistic update
-      const tempId = `temp-${Date.now()}`;
-      
-      // Create a temporary subgoal object for optimistic update
-      const tempSubGoal = {
-        id: tempId,
-        name: subGoal.name,
-        goal: subGoal.goal,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      
-      // Optimistically update the UI
-      setGoals(prevGoals => 
-        prevGoals.map(goal => {
-          if (goal.id === subGoal.goal) {
-            return {
-              ...goal,
-              sub_goals: [...goal.sub_goals, tempSubGoal],
-            };
-          }
-          return goal;
-        })
-      );
-      
-      // If we have a currentGoal, update it as well
-      if (currentGoal && currentGoal.id === subGoal.goal) {
-        setCurrentGoal(prevGoal => {
-          if (!prevGoal) return null;
-          return {
-            ...prevGoal,
-            sub_goals: [...prevGoal.sub_goals, tempSubGoal],
-          };
-        });
-      }
-      
-      // Make the API call
       const newSubGoal = await addSubGoalApi(subGoal);
-      console.log('GoalContext: Subgoal added successfully:', newSubGoal);
       
-      // Update the UI with the real data from the server
-      setGoals(prevGoals => 
-        prevGoals.map(goal => {
-          if (goal.id === subGoal.goal) {
-            return {
-              ...goal,
-              sub_goals: goal.sub_goals.map(sg => 
-                sg.id === tempId ? newSubGoal : sg
-              ),
-            };
-          }
-          return goal;
-        })
-      );
-      
-      // Update currentGoal if needed
-      if (currentGoal && currentGoal.id === subGoal.goal) {
-        setCurrentGoal(prevGoal => {
-          if (!prevGoal) return null;
-          return {
-            ...prevGoal,
-            sub_goals: prevGoal.sub_goals.map(sg => 
-              sg.id === tempId ? newSubGoal : sg
-            ),
-          };
-        });
-      }
-      
-      // Invalidate the goals query to ensure data consistency
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      // No need to update local state here, Supabase Realtime will handle it
       
       return newSubGoal;
     } catch (err) {
-      console.error('GoalContext: Error adding subgoal:', err);
-      
-      // Revert the optimistic update on error
-      setGoals(prevGoals => 
-        prevGoals.map(goal => {
-          if (goal.id === subGoal.goal) {
-            return {
-              ...goal,
-              sub_goals: goal.sub_goals.filter(sg => !sg.id.startsWith('temp-')),
-            };
-          }
-          return goal;
-        })
-      );
-      
-      // Revert currentGoal if needed
-      if (currentGoal && currentGoal.id === subGoal.goal) {
-        setCurrentGoal(prevGoal => {
-          if (!prevGoal) return null;
-          return {
-            ...prevGoal,
-            sub_goals: prevGoal.sub_goals.filter(sg => !sg.id.startsWith('temp-')),
-          };
-        });
-      }
-      
       setError(err instanceof Error ? err.message : "Failed to add sub-goal");
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [queryClient, currentGoal]);
+  }, []);
 
   const updateSubGoal = useCallback(async (subGoal: any) => {
     try {
@@ -375,8 +350,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
       const updatedSubGoal = await updateSubGoalApi(subGoal);
       
-      // Invalidate the goals query to refetch the data
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      // No need to update local state here, Supabase Realtime will handle it
       
       return updatedSubGoal;
     } catch (err) {
@@ -385,7 +359,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  }, [queryClient]);
+  }, []);
 
   const deleteSubGoal = useCallback(async (id: string) => {
     try {
@@ -393,8 +367,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
       setError(null);
       await deleteSubGoalApi(id);
       
-      // Invalidate the goals query to refetch the data
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      // No need to update local state here, Supabase Realtime will handle it
       
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete sub-goal");
@@ -402,7 +375,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  }, [queryClient]);
+  }, []);
 
   // Move sub-goal ordering locally (for drag/drop UI)
   const moveSubGoal = (goalId: string, fromIndex: number, toIndex: number) => {
@@ -451,6 +424,7 @@ export const GoalProvider: React.FC<{ children: React.ReactNode }> = ({
     moveSubGoal,
     getGoalById,
     getGoalBySubGoalId,
+    refreshGoals: () => fetchGoals(true),
   };
 
   return <GoalContext.Provider value={value}>{children}</GoalContext.Provider>;

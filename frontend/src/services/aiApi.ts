@@ -5,10 +5,12 @@ import api from './axios';
  * Expects { existing_goals: [...] } in the body
  * Returns { goal: "...", description: "..." }
  */
-export async function generateNewGoalFromAI(existingGoals: any[], previousGenerations: any[] = []) {
+export async function generateNewGoalFromAI(existingGoals: any[], previousGenerations: any[] = [], attempt: number = 0) {
   const response = await api.post('/gen-ai/new-goal/', { 
     existing_goals: existingGoals,
-    previous_generations: previousGenerations
+    previous_generations: previousGenerations,
+    timestamp: new Date().toISOString(),
+    attempt: attempt
   });
   return response.data; // Returns { goal: "...", description: "..." }
 }

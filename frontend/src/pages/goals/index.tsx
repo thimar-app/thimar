@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import React from 'react';
-
+import styles from "./goal.module.css";
 import GoalsHeader from "./header";
 import { CirclePlus, Loader, Sparkles, TrendingUp, ChevronLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,8 @@ export default function Goals() {
   // AI-based generation states
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [aiGeneratedGoal, setAiGeneratedGoal] = useState<string>("");
+  const [previousGoalGenerations, setPreviousGoalGenerations] = useState<any[]>([]);
+  const [generationAttempt, setGenerationAttempt] = useState(0);
 
   const navigate = useNavigate();
 
@@ -104,16 +106,34 @@ export default function Goals() {
         progress: goal.progress
       })) || [];
 
-      const response = await generateNewGoalFromAI(existingGoals);
+      // Increment attempt counter
+      const currentAttempt = generationAttempt + 1;
+      setGenerationAttempt(currentAttempt);
+
+      const response = await generateNewGoalFromAI(
+        existingGoals, 
+        previousGoalGenerations,
+        currentAttempt
+      );
+      
       // Format the response object into a string
       const formattedResponse = `Goal: ${response.goal}\n\nDescription: ${response.description}`;
       setAiGeneratedGoal(formattedResponse);
+      
+      // Store this generation in the history
+      setPreviousGoalGenerations(prev => [...prev, response]);
+      
       setAiDialogOpen(true);
     } catch (error) {
       console.error('Error generating goal with AI:', error);
     } finally {
       setIsGenerateButtonLoading(false);
     }
+  };
+
+  // Handle regenerate with AI
+  const handleRegenerateWithAI = async () => {
+    await handleGenerateWithAI();
   };
 
   // Handle save generated goal
@@ -139,6 +159,9 @@ export default function Goals() {
       
       // Add the goal using the context function
       await addGoal(formData);
+      
+      // Reset generation attempt counter
+      setGenerationAttempt(0);
       
       // Close the dialog and refresh the goals list
       setAiDialogOpen(false);
@@ -182,9 +205,9 @@ export default function Goals() {
   const totalPages = pagination?.totalPages || 1;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       <GoalsHeader />
-      <div className="flex-1 overflow-auto p-6">
+      <div className={`flex-1 overflow-auto p-6 ${styles.noScrollbar}`}>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">Goals</h1>
@@ -248,7 +271,7 @@ export default function Goals() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {paginatedGoals.map((goal) => (
                 <div 
                   key={goal.id} 
@@ -322,18 +345,18 @@ export default function Goals() {
             </Button>
             <Button
               variant="outline"
-              onClick={handleGenerateWithAI}
+              onClick={handleRegenerateWithAI}
               disabled={isGenerateButtonLoading}
             >
               {isGenerateButtonLoading ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
+                  Regenerating...
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Generate New
+                  Regenerate
                 </>
               )}
             </Button>

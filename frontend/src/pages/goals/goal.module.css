@@ -1,0 +1,9 @@
+/* YourComponent.module.css */
+.noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .noScrollbar::-webkit-scrollbar {
+    display: none;
+  }

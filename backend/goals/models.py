@@ -12,9 +12,9 @@ class Goal(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     # image = models.ImageField(upload_to="goals/images/", blank=True, null=True)
-    image_url = models.URLField(blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True, default="https://fagzgyrlxrpvniypexil.supabase.co/storage/v1/object/public/goal-images//defualt_goal_image.png")
     # Optional: store the image path in Supabase storage
-    image_path = models.CharField(max_length=255, blank=True, null=True)
+    image_path = models.CharField(max_length=255, blank=True, null=True, default="https://fagzgyrlxrpvniypexil.supabase.co/storage/v1/object/public/goal-images//defualt_goal_image.png")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

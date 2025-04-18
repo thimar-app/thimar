@@ -26,6 +26,8 @@ class GenerateGoalView(APIView):
         # 2) Parse user data
         existing_goals = request.data.get("existing_goals", [])
         previous_generations = request.data.get("previous_generations", [])  # List of previous goal suggestions
+        timestamp = request.data.get("timestamp", datetime.now().isoformat())  # Added timestamp for uniqueness
+        attempt = request.data.get("attempt", 0)  # Added attempt counter for uniqueness
 
         if not existing_goals:
             return Response(
@@ -49,6 +51,11 @@ class GenerateGoalView(APIView):
                 "- Strengthening family bonds (silat ar-rahim) "
                 "- Contributing to community (khidma) "
                 "- Spiritual development (tazkiyah) "
+                "- Financial responsibility (amana) "
+                "- Environmental stewardship (khalifa) "
+                "- Personal development (tazkiyah) "
+                "- Social justice (adl) "
+                "- Gratitude (shukr) "
                 "Provide a concise, actionable goal with a brief explanation of its Islamic significance and practical benefits. "
                 "IMPORTANT: Each response must be unique and different from previous generations. "
                 "Avoid suggesting similar goals or using the same explanations."
@@ -57,18 +64,21 @@ class GenerateGoalView(APIView):
 
         user_message = {
             "role": "user",
-            "content": self._build_prompt(existing_goals, previous_generations)
+            "content": self._build_prompt(existing_goals, previous_generations, timestamp, attempt)
         }
 
         messages = [system_message, user_message]
 
         # 5) Call Mistral chat
         try:
+            # Increase temperature for more variety, especially on regeneration attempts
+            temperature = min(0.9 + (attempt * 0.1), 1.0)  # Increase temperature with each attempt, max 1.0
+            
             response = client.chat.complete(
                 model="mistral-large-latest",
                 messages=messages,
                 max_tokens=300,
-                temperature=0.9  # Increased for more variety
+                temperature=temperature  # Dynamic temperature based on attempt
             )
 
             ai_text = response.choices[0].message.content.strip()
@@ -94,7 +104,7 @@ class GenerateGoalView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def _build_prompt(self, existing_goals, previous_generations):
+    def _build_prompt(self, existing_goals, previous_generations, timestamp="", attempt=0):
         """
         Construct a user message describing the user's existing goals,
         plus instructions on what we want back.
@@ -111,13 +121,17 @@ class GenerateGoalView(APIView):
             previous_generations_str = "\nPreviously Suggested Goals:\n" + "\n".join(
                 f"- Goal: {gen.get('goal', '')}\n  Description: {gen.get('description', '')}"
                 for gen in previous_generations[-3:]  # Only show last 3 generations
-        )
+            )
+
+        # Add timestamp and attempt to force uniqueness
+        uniqueness_str = f"\nTimestamp: {timestamp}\nAttempt: {attempt}\n"
 
         prompt = f"""
 Below is a list of the user's current goals, each with some progress and a brief description:
 
 {goals_str}
 {previous_generations_str}
+{uniqueness_str}
 
 Now, please suggest:
 1) A new goal (title) that aligns or complements these existing goals.
@@ -132,6 +146,7 @@ The goal should:
 - Be COMPLETELY DIFFERENT from previously suggested goals
 - Use different Islamic principles or focus areas than previous suggestions
 - Provide a fresh perspective on productivity and spiritual growth
+- Vary in scope and complexity from previous suggestions
 
 IMPORTANT: The description MUST be extremely concise - only 4-6 words total.
 
@@ -162,11 +177,16 @@ DESCRIPTION: <4-6 word description>
             prev_goal_words = set(prev_gen.get("goal", "").lower().split())
             prev_desc_words = set(prev_gen.get("description", "").lower().split())
             
-            goal_overlap = len(new_goal_words.intersection(prev_goal_words)) / len(new_goal_words)
-            desc_overlap = len(new_desc_words.intersection(prev_desc_words)) / len(new_desc_words)
-            
-            if goal_overlap > 0.7 or desc_overlap > 0.7:  # If more than 70% words are the same
-                return True
+            # Calculate word overlap percentage
+            if new_goal_words and prev_goal_words:
+                goal_overlap = len(new_goal_words.intersection(prev_goal_words)) / len(new_goal_words)
+                if goal_overlap > 0.6:  # Reduced from 0.7 to 0.6 to catch more duplicates
+                    return True
+                    
+            if new_desc_words and prev_desc_words:
+                desc_overlap = len(new_desc_words.intersection(prev_desc_words)) / len(new_desc_words)
+                if desc_overlap > 0.6:  # Reduced from 0.7 to 0.6 to catch more duplicates
+                    return True
 
         return False
 

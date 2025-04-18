@@ -43,7 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setCurrentUser(null);
         }
       } finally {
-        setLoading(false);
+        // Add a small delay to prevent flickering of the loading state
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
       }
     };
 
