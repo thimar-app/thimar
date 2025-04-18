@@ -1,1 +1,1 @@
-web: cd backend && gunicorn thimar_project.wsgi
+cd backend && daphne thimar_project.wsgi
