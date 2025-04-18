@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-s(%!9%iu8m6k7$ne=z2kl%ka$n%@k9r-13$42#m!znrt(o2!)1"
+# SECRET_KEY = "django-insecure-s(%!9%iu8m6k7$ne=z2kl%ka$n%@k9r-13$42#m!znrt(o2!)1"
 
 # Initialize environment variables
 env = environ.Env(
@@ -33,12 +33,12 @@ env = environ.Env(
 # Read the .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+DEBUG = os.getenv('DEBUG', default=False)
+SECRET_KEY = os.getenv('SECRET_KEY')
+ALLOWED_HOSTS = ['*']  # or better: ['yourapp.up.railway.app']
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = env('DEBUG')
-DEBUG = True
 
 CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS = ['thimar.onrender.com','127.0.0.1','localhost']
 
 # Application definition
 

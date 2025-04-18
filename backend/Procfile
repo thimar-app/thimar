@@ -1,0 +1,1 @@
+web: cd backend && gunicorn thimar_project.wsgi
