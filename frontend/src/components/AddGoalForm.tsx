@@ -32,6 +32,7 @@ const AddGoalForm: React.FC = () => {
         formData.append('image', image);
       }
 
+      
       const axiosInstance = authAxios || await createAxiosInstance();
       if (!axiosInstance) {
         throw new Error('Failed to initialize API client');
