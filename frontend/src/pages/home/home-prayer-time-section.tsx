@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { checkPrayerTimesUpdate } from "@/services/prayersApi"; 
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "https://midyear-acre-457323-k1.ey.r.appspot.com/api";
 
 const getAuthHeader = () => {
   const token =

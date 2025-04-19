@@ -1,1 +1,1 @@
-web: cd backend && pipenv run daphne thimar_project.asgi:application
+web: gunicorn thimar_project.wsgi:application --bind 0.0.0.0:$PORT

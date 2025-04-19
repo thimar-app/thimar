@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-react";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import { useState, useCallback, useEffect, useRef } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://midyear-acre-457323-k1.ey.r.appspot.com";
 
 interface Location {
   latitude: number;

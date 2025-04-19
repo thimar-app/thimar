@@ -1,19 +1,40 @@
+# Django core
 Django>=3.2,<4.2
 djangorestframework>=3.12,<3.14
-psycopg2-binary>=2.8
 django-cors-headers>=3.5
 django-environ==0.12.0
 djangorestframework-simplejwt==5.3.1
+
+# Database
+psycopg2-binary>=2.8
+dj-database-url
+
+# Authentication
+django-oauth-toolkit>=1.6
+
+# Media
 Pillow>=10.4.0
+
+# Task processing
 celery==5.4.0
 gunicorn
+
+# API clients
 openai==1.67.0
-# Prayer times library
+mistralai
+supabase>=2.0.0,<3.0.0
+
+# Prayer times
 praytimes
-celery
-# Optional caching support
-django-redis>=4.12 
+
+# Caching
+django-redis>=4.12
+
 # API documentation
 drf-yasg>=1.20
 
-supabase>=2.0.0,<3.0.0
+# Config
+python-decouple
+
+# ASGI server
+daphne
