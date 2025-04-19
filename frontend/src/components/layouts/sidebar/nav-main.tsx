@@ -47,7 +47,7 @@ export function NavMain({
             className="text-foreground bg-sidebar-accent hover:bg-sidebar-primary cursor-pointer justify-center border border-dashed"
           >
             <CirclePlus strokeWidth={1.5} />
-            <span>Add Goal 7</span>
+            <span>Add Goal</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </AddGoalDialog>

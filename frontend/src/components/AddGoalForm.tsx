@@ -7,7 +7,7 @@ import { addGoalApi } from '../services/api';
 const AddGoalForm: React.FC = () => {
   const navigate = useNavigate();
   const { addGoal } = useGoalContext();
-  const { authAxios, retryWithFreshToken, isReady, createAxiosInstance } = useAuthAxios();
+  const { authAxios, isReady, createAxiosInstance } = useAuthAxios();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -37,7 +37,7 @@ const AddGoalForm: React.FC = () => {
         throw new Error('Failed to initialize API client');
       }
 
-      const newGoal = await addGoalApi(axiosInstance, retryWithFreshToken, formData, "", "");
+      const newGoal = await addGoalApi(axiosInstance, formData, "", ""); // Provide the fourth argument
       addGoal(newGoal);
       navigate('/goals');
     } catch (err) {

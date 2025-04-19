@@ -107,7 +107,7 @@ export const addGoalApi = async (goal: FormData | any, formData: FormData, userI
   const goalData = goal instanceof FormData ? goal : jsonToFormData(goal);
   
   // Create a custom config for the request
-  const config = {
+  const config: { headers?: Record<string, string> } = {
     // No need to set headers here, the axios interceptor will handle it
   };
   
