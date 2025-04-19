@@ -60,7 +60,7 @@ const App: React.FC = () => {
                   <GoalProvider>
                     <Layout>
                       <Routes>
-                        <Route path="/home" element={<Home />} />
+                        <Route path="/" element={<Home />} />
                         <Route path="/goals" element={<Goals />} />
                         <Route path="/goals/:goalId" element={<GoalDetails />} />
                         <Route path="/tasks" element={<Tasks />} />
