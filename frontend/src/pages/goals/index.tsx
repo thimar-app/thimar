@@ -36,6 +36,7 @@ export default function Goals() {
   const [isGenerateButtonLoading, setIsGenerateButtonLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch paginated goals and all goals for progress calculation
@@ -49,6 +50,11 @@ export default function Goals() {
     goals: allGoalsData, 
     isLoading: isLoadingAll
   } = useAllGoalsQuery();
+
+  // Calculate goal counts
+  const totalGoals = allGoalsData?.length || 0;
+  const completedGoals = allGoalsData?.filter(goal => goal.progress === 100).length || 0;
+  const inProgressGoals = allGoalsData?.filter(goal => goal.progress > 0 && goal.progress < 100).length || 0;
 
   // AI-based generation states
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -173,18 +179,33 @@ export default function Goals() {
 
   // Handle goal click
   const handleGoalClick = (goal: Goal) => {
-    console.log("Goal clicked:", goal);
-    // Ensure we have a valid goal ID
-    if (!goal || !goal.id) {
-      console.error("Invalid goal object:", goal);
-      return;
-    }
-    
-    // Set the current goal in context
     setCurrentGoal(goal);
-    
-    // Navigate to the goal details page
     navigate(`/goals/${goal.id}`);
+  };
+
+  // Handle goal editing
+  const handleEditGoal = (goal: Goal) => {
+    // TODO: Implement goal editing
+    console.log('Edit goal:', goal);
+  };
+
+  // Handle goal deletion
+  const handleDeleteGoal = (goal: Goal) => {
+    // TODO: Implement goal deletion
+    console.log('Delete goal:', goal);
+  };
+
+  // Handle adding a new goal
+  const handleAddGoal = async (formData: FormData) => {
+    try {
+      await addGoal(formData);
+      setShowAddDialog(false);
+      // Refresh the goals list
+      await queryClient.invalidateQueries({ queryKey: ['goals'] });
+      await queryClient.invalidateQueries({ queryKey: ['allGoals'] });
+    } catch (error) {
+      console.error('Error adding goal:', error);
+    }
   };
 
   // -------------------------------------
@@ -205,120 +226,99 @@ export default function Goals() {
   const totalPages = pagination?.totalPages || 1;
 
   return (
-    <div className="flex flex-col h-full ">
+    <main className="flex flex-col">
       <GoalsHeader />
-      <div className={`flex-1 overflow-auto p-6 ${styles.noScrollbar}`}>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Goals</h1>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="ml-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handleGenerateWithAI}
-              disabled={isGenerateButtonLoading}
-            >
-              {isGenerateButtonLoading ? (
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="mr-2 h-4 w-4" />
-              )}
-              Generate with AI
-            </Button>
-            <AddGoalDialog>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Goal
-              </Button>
-            </AddGoalDialog>
-          </div>
-        </div>
-
+      <div className="flex flex-col gap-4 p-4">
         {/* Progress Card */}
-        <Card className="p-4 mb-6">
+        <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-lg font-medium">Overall Progress</h2>
-            <span className="text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
+            <h2 className="text-sm sm:text-lg font-medium">Overall Progress</h2>
+            <span className="text-xs sm:text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
           </div>
-          <Progress value={overallProgress} className="h-2" />
+          <Progress value={overallProgress} className="h-1.5 sm:h-2" />
         </Card>
 
-        {/* Goals Grid */}
-        {isLoadingPaginated ? (
-          <GoalSkeletonGrid />
-        ) : paginatedGoals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <CirclePlus className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No goals yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Create your first goal to start tracking your progress
-            </p>
-            <AddGoalDialog>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Goal
-              </Button>
-            </AddGoalDialog>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              {paginatedGoals.map((goal) => (
-                <div 
-                  key={goal.id} 
-                  onClick={() => handleGoalClick(goal)}
-                  className="cursor-pointer"
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleGoalClick(goal);
-                    }
-                  }}
-                >
-                  <GoalCard
-                    title={goal.name}
-                    progress={goal.progress}
-                    image_url={goal.image_url}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-6">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={!pagination.hasPreviousPage}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm">
-                  Page {currentPage} of {pagination.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleGenerateWithAI}
+            disabled={isGenerateButtonLoading}
+            className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm"
+          >
+            {isGenerateButtonLoading ? (
+              <Loader className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            ) : (
+              <Sparkles className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             )}
-          </>
+            Generate with AI
+          </Button>
+          <AddGoalDialog>
+            <Button className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm">
+              <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              Add Goal
+            </Button>
+          </AddGoalDialog>
+        </div>
+
+        {/* Goals Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {isLoadingPaginated ? (
+            <GoalSkeletonGrid />
+          ) : paginatedGoals?.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+              <CirclePlus className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">No goals yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Create your first goal to start tracking your progress
+              </p>
+              <AddGoalDialog>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Goal
+                </Button>
+              </AddGoalDialog>
+            </div>
+          ) : (
+            paginatedGoals?.map((goal) => (
+              <div
+                key={goal.id}
+                onClick={() => handleGoalClick(goal)}
+                className="cursor-pointer"
+              >
+                <GoalCard
+                  title={goal.name}
+                  progress={goal.progress}
+                  image_url={goal.image_url}
+                />
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!pagination.hasPreviousPage}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!pagination.hasNextPage}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
 
@@ -372,6 +372,6 @@ export default function Goals() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }

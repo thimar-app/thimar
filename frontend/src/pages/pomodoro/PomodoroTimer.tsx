@@ -474,17 +474,17 @@ export function PomodoroTimer() {
     <div className="flex w-full h-full justify-center items-center">
       <div
         className={cn(
-          "flex flex-1 flex-col items-center justify-center p-8 transition-all duration-300",
-          showPreferences || showSoundPreferences ? "w-1/2" : "w-full"
+          "flex flex-1 flex-col items-center justify-center p-4 sm:p-8 transition-all duration-300",
+          showPreferences || showSoundPreferences ? "w-full sm:w-1/2" : "w-full"
         )}
       >
-        <div className="text-lg font-medium text-muted-foreground mb-2">
+        <div className="text-sm sm:text-lg font-medium text-muted-foreground mb-1 sm:mb-2">
           {getStateLabel()}{" "}
           {timerState === "pomodoro" && `(${(pomodoroCount % 4) + 1}/4)`}
         </div>
 
         <div
-          className="relative cursor-pointer mb-8"
+          className="relative cursor-pointer mb-4 sm:mb-8"
           onClick={() => {
             setShowPreferences(!showPreferences);
             if (!showPreferences && showSoundPreferences) {
@@ -492,7 +492,7 @@ export function PomodoroTimer() {
             }
           }}
         >
-          <svg width="280" height="280" viewBox="0 0 280 280">
+          <svg width="240" height="240" viewBox="0 0 280 280" className="w-[240px] h-[240px] sm:w-[280px] sm:h-[280px]">
             <circle
               cx="140"
               cy="140"
@@ -517,10 +517,10 @@ export function PomodoroTimer() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-6xl p-2 rounded-lg hover:bg-card font-semibold">
+            <span className="text-4xl sm:text-6xl p-1 sm:p-2 rounded-lg hover:bg-card font-semibold">
               {formatTime(timeLeft)}
             </span>
-            <span className="text-muted-foreground mt-2">
+            <span className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
               {timerStatus === "running"
                 ? "running"
                 : timerStatus === "completed"
@@ -530,9 +530,9 @@ export function PomodoroTimer() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
           <Button
-            className="bg-[#7c3aed] hover:bg-[#6d28d9] px-8 py-2 rounded-md"
+            className="bg-[#7c3aed] hover:bg-[#6d28d9] px-4 sm:px-8 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm h-8 sm:h-10"
             onClick={toggleTimer}
           >
             {getButtonLabel()}
@@ -540,31 +540,30 @@ export function PomodoroTimer() {
 
           {timerStatus === "paused" && (
             <Button
-              className="bg-[#333333] hover:bg-[#444444] px-6 py-2 rounded-md"
+              className="bg-[#333333] hover:bg-[#444444] px-3 sm:px-6 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm h-8 sm:h-10"
               onClick={moveToNextState}
             >
               Skip
             </Button>
           )}
 
-          {/* Update the sound button label to clarify its purpose */}
           <Button
             variant="ghost"
             size="icon"
             className={cn(
-              "bg-[#333333] hover:bg-[#444444] text-white rounded-md",
+              "bg-[#333333] hover:bg-[#444444] text-white rounded-md h-8 w-8 sm:h-10 sm:w-10",
               showSoundPreferences && "bg-[#7c3aed] hover:bg-[#6d28d9]"
             )}
             onClick={toggleSound}
             aria-label="Sound Preferences"
           >
-            <Volume2 size={20} />
+            <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </div>
 
       {showPreferences && (
-        <div className="w-1/2 max-w-md bg-transparent border-l border-[#333333] px-6 overflow-auto">
+        <div className="w-full sm:w-1/2 max-w-md bg-transparent border-l border-[#333333] p-4 sm:p-6 overflow-auto">
           <TimerPreferences
             settings={settings}
             updateSettings={updateSettings}
@@ -573,7 +572,7 @@ export function PomodoroTimer() {
       )}
 
       {showSoundPreferences && (
-        <div className="w-1/2 max-w-md bg-transparent border-l border-[#333333] overflow-auto px-6">
+        <div className="w-full sm:w-1/2 max-w-md bg-transparent border-l border-[#333333] overflow-auto p-4 sm:p-6">
           <SoundPreferences
             settings={settings}
             updateSettings={updateSettings}

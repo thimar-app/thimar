@@ -123,7 +123,7 @@ const Register: React.FC = () => {
       const userProfile = await getUserProfile();
       setCurrentUser(userProfile);
       
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       setErrors(error as ApiError);
     } finally {

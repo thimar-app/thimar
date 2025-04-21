@@ -17,6 +17,33 @@ interface BaraqahData {
   explanation: string;
 }
 
+// Add media queries for responsiveness
+const styles = {
+  container: `flex flex-col gap-4`,
+  dialog: `fixed inset-0 z-50 flex items-center justify-center`,
+  dialogContainer: `relative bg-gray-800 rounded-lg shadow-2xl max-w-md w-full p-8 mx-4 transform transition-all duration-300 scale-100`,
+  progressSection: `flex items-center gap-4`,
+  progressBar: `w-full h-12 bg-muted rounded-lg flex items-center justify-center gap-4 px-5`,
+  progressBarInner: `bg-violet-600 h-3 rounded-full align-baseline transition-all duration-300 ease-in-out`,
+  button: `min-w-72 h-12 bg-violet-600 rounded-lg`,
+  section: `w-full p-4 bg-muted rounded-lg`,
+};
+
+// Media queries for responsiveness
+const mediaQueries = `
+  @media (max-width: 768px) {
+    .${styles.dialogContainer} {
+      max-width: 90%;
+    }
+    .${styles.progressSection} {
+      flex-direction: column;
+    }
+    .${styles.button} {
+      width: 100%;
+    }
+  }
+`;
+
 export default function Home() {
   const [view, setView] = useState<View>("simple-list");
   const [showPrayerSection, setShowPrayerSection] = useState(true);
@@ -97,6 +124,7 @@ export default function Home() {
 
   return (
     <>
+      <style>{mediaQueries}</style>
       <HomeHeader
         view={view}
         setView={setView}
@@ -108,11 +136,11 @@ export default function Home() {
 
       {/* Dialog for displaying the baraqah */}
       {showBaraqahDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className={styles.dialog}>
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black opacity-60"></div>
           {/* Dialog container */}
-          <div className="relative bg-gray-800  rounded-lg shadow-2xl max-w-md w-full p-8 mx-4 transform transition-all duration-300 scale-100">
+          <div className={styles.dialogContainer}>
             <h2 className="text-2xl font-bold mb-4 text-center text-white">
               Today's Barakah
             </h2>
@@ -151,21 +179,21 @@ export default function Home() {
         </div>
       )}
 
-      <main className="flex flex-col gap-4">
+      <main className={styles.container}>
         {showPrayerSection && <HomePrayerTimeSection />}
 
-        <section className="flex items-center gap-4">
-          <div className="w-full h-12 bg-muted rounded-lg flex items-center justify-center gap-4 px-5">
+        <section className={styles.progressSection}>
+          <div className={styles.progressBar}>
             <div className="w-full h-3 rounded-full bg-muted-foreground/30">
               <div
-                className="bg-violet-600 h-3 rounded-full align-baseline transition-all duration-300 ease-in-out"
+                className={styles.progressBarInner}
                 style={{ width: `${progress.percentage}%` }}
               />
             </div>
             <span>{progress.formattedPercentage}</span>
           </div>
           <Button
-            className="min-w-72 h-12 bg-violet-600 rounded-lg"
+            className={styles.button}
             disabled={isLoading}
             onClick={handleGetTodaysBarakah}
           >
@@ -174,7 +202,7 @@ export default function Home() {
           </Button>
         </section>
 
-        <section className="w-full p-4 bg-muted rounded-lg">
+        <section className={styles.section}>
           {view === "prayer-list" ? (
             <PrayerListView />
           ) : (

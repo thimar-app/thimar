@@ -109,11 +109,11 @@ export default function HomePrayerTimeSection() {
 
   if (isLoading) {
     return (
-      <section className="flex items-center gap-4">
-        <div className="w-full h-72 bg-muted rounded-lg flex items-center justify-center">
+      <section className="flex flex-col sm:flex-row items-center gap-4 p-4 sm:p-6">
+        <div className="w-full h-48 sm:h-72 bg-muted rounded-lg flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
         </div>
-        <div className="min-w-72 h-72 bg-muted rounded-lg flex items-center justify-center">
+        <div className="hidden sm:block w-full sm:min-w-72 h-48 sm:h-72 bg-muted rounded-lg flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
         </div>
       </section>
@@ -121,34 +121,41 @@ export default function HomePrayerTimeSection() {
   }
 
   return (
-    <section className="flex items-center gap-4">
-      {/* Left block: render all prayers */}
-      <div className="w-full h-72 bg-muted rounded-lg grid grid-cols-4 grid-rows-2 gap-4 p-4">
+    <section className="flex flex-col sm:flex-row items-center gap-4 p-4 sm:p-6">
+      {/* Prayer Times Grid */}
+      <div className="w-full h-auto sm:h-72 bg-muted rounded-lg grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 p-3 sm:p-4">
         {prayers.map((p) => {
           const displayTime = p.time ? p.time.slice(0, 5) : "00:00";
           return (
             <div
               key={p.id}
-              className="bg-card rounded-sm flex flex-col items-start pl-4 justify-center"
+              className="bg-card rounded-lg flex flex-col items-center justify-center p-3 sm:p-4 gap-1 sm:gap-2"
             >
-              <span className="capitalize text-lg">{p.name}</span>
-              <span className="text-4xl">{displayTime}</span>
+              <span className="capitalize text-sm sm:text-base font-medium">{p.name}</span>
+              <span className="text-2xl sm:text-4xl font-semibold">{displayTime}</span>
             </div>
           );
         })}
       </div>
 
-      {/* Right block: ring and next prayer info */}
-      <div className="min-w-72 h-72 bg-muted rounded-lg flex items-center justify-center">
+      {/* Next Prayer Section - Hidden on Mobile */}
+      <div className="hidden sm:block w-full sm:min-w-72 h-72 bg-muted rounded-lg flex items-center justify-center p-4">
         <div
           style={style}
-          className="relative rounded-[100%] bg-white size-56 flex items-center justify-center"
+          className="relative rounded-[100%] bg-white size-40 sm:size-56 flex items-center justify-center"
         >
-          <div className="rounded-[100%] bg-muted size-[13.3rem] flex flex-col items-center justify-center">
-            {/* Display the next prayer and the time remaining */}
-            <span>{nextPrayerName} Prayer After</span>
-            <span className="text-3xl">{timeUntilNextPrayer}</span>
+          <div className="rounded-[100%] bg-muted size-[9.5rem] sm:size-[13.3rem] flex flex-col items-center justify-center gap-2">
+            <span className="text-sm sm:text-base font-medium">{nextPrayerName} Prayer After</span>
+            <span className="text-2xl sm:text-3xl font-semibold">{timeUntilNextPrayer}</span>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Next Prayer Info */}
+      <div className="sm:hidden w-full bg-muted rounded-lg p-4">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-base font-medium">{nextPrayerName} Prayer After</span>
+          <span className="text-2xl font-semibold">{timeUntilNextPrayer}</span>
         </div>
       </div>
     </section>

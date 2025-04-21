@@ -106,14 +106,14 @@ export default function Tasks() {
     <main className="flex flex-col">
       <TasksHeader />
       {/* Progress Bar Section */}
-      <section className="flex items-center gap-3">
+      <section className="flex flex-col sm:flex-row items-center gap-3 p-4">
         <div className="w-full p-4 pb-5 bg-muted rounded-lg flex flex-col items-center justify-center gap-4">
           <div className="flex justify-between items-center w-full">
-            <h2 className="flex items-center gap-3 font-semibold text-lg">
-              <TrendingUp />
+            <h2 className="flex items-center gap-3 font-semibold text-base sm:text-lg">
+              <TrendingUp className="size-4 sm:size-5" />
               Tasks Progress
             </h2>
-            <span className="font-semibold text-lg text-muted-foreground">
+            <span className="font-semibold text-base sm:text-lg text-muted-foreground">
               {progress.formattedPercentage}
             </span>
           </div>
@@ -124,29 +124,29 @@ export default function Tasks() {
             />
           </div>
         </div>
-        <div className="flex flex-col w-52 bg-muted rounded-lg py-4 items-center">
-          <span className="flex gap-2 items-center font-semibold text-lg">
-            <CheckCircle2 className="size-4" />
+        <div className="flex flex-col w-full sm:w-52 bg-muted rounded-lg py-4 items-center">
+          <span className="flex gap-2 items-center font-semibold text-base sm:text-lg">
+            <CheckCircle2 className="size-4 sm:size-5" />
             Tasks Done
           </span>
-          <span className="font-semibold text-2xl text-muted-foreground">
+          <span className="font-semibold text-xl sm:text-2xl text-muted-foreground">
             {completedTasks}/{totalTasks}
           </span>
         </div>
       </section>
 
       {/* Filter Buttons Section */}
-      <section className="gap-2 my-4 grid grid-cols-4">
+      <section className="gap-2 my-4 px-4 grid grid-cols-2 sm:grid-cols-4">
         {/* Goals Filter */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              className={`px-8 h-10 ${
+              className={`w-full h-10 ${
                 selectedGoals.length ? "bg-violet-800" : "bg-violet-600"
               }`}
             >
-              <Goal className="mr-2" />
-              Filter by Goals
+              <Goal className="mr-2 size-4 sm:size-5" />
+              <span className="hidden sm:inline">Filter by</span> Goals
               {selectedGoals.length > 0 && (
                 <span className="ml-1 bg-white text-violet-800 rounded-full px-2 text-xs font-bold">
                   {selectedGoals.length}
@@ -199,12 +199,12 @@ export default function Tasks() {
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              className={`px-8 h-10 ${
+              className={`w-full h-10 ${
                 selectedPriorities.length ? "bg-violet-800" : "bg-violet-600"
               }`}
             >
-              <Flag className="mr-2" />
-              Filter by Priorities
+              <Flag className="mr-2 size-4 sm:size-5" />
+              <span className="hidden sm:inline">Filter by</span> Priority
               {selectedPriorities.length > 0 && (
                 <span className="ml-1 bg-white text-violet-800 rounded-full px-2 text-xs font-bold">
                   {selectedPriorities.length}
@@ -248,12 +248,12 @@ export default function Tasks() {
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              className={`px-8 h-10 ${
+              className={`w-full h-10 ${
                 selectedDates.length ? "bg-violet-800" : "bg-violet-600"
               }`}
             >
-              <Calendar1 className="mr-2" />
-              Filter by Date
+              <Calendar1 className="mr-2 size-4 sm:size-5" />
+              <span className="hidden sm:inline">Filter by</span> Date
               {selectedDates.length > 0 && (
                 <span className="ml-1 bg-white text-violet-800 rounded-full px-2 text-xs font-bold">
                   {selectedDates.length}
@@ -295,11 +295,11 @@ export default function Tasks() {
         {/* Habits Filter */}
         <Button
           variant={showOnlyHabits ? "default" : "secondary"}
-          className={`px-8 h-10 ${showOnlyHabits ? "bg-violet-800" : ""}`}
+          className={`w-full h-10 ${showOnlyHabits ? "bg-violet-800" : ""}`}
           onClick={() => setShowOnlyHabits(!showOnlyHabits)}
         >
-          <CalendarSync className="mr-2" />
-          Show only Habits
+          <CalendarSync className="mr-2 size-4 sm:size-5" />
+          <span className="hidden sm:inline">Show only</span> Habits
           {showOnlyHabits && (
             <span className="ml-1 bg-white text-violet-800 rounded-full px-2 text-xs font-bold">
               ✓
@@ -313,7 +313,7 @@ export default function Tasks() {
         selectedPriorities.length > 0 ||
         selectedDates.length > 0 ||
         showOnlyHabits) && (
-        <section className="mb-4 flex flex-wrap gap-2">
+        <section className="mb-4 px-4 flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -331,7 +331,7 @@ export default function Tasks() {
               className="h-8 bg-violet-100"
               onClick={() => toggleGoal(goal)}
             >
-              Goal: {goal} <X className="ml-1 size-3" />
+              <span className="hidden sm:inline">Goal:</span> {goal} <X className="ml-1 size-3" />
             </Button>
           ))}
 
@@ -343,7 +343,7 @@ export default function Tasks() {
               className="h-8 bg-violet-100"
               onClick={() => togglePriority(priority)}
             >
-              Priority: {priority} <X className="ml-1 size-3" />
+              <span className="hidden sm:inline">Priority:</span> {priority} <X className="ml-1 size-3" />
             </Button>
           ))}
 
@@ -357,7 +357,7 @@ export default function Tasks() {
                 setSelectedDates((prev) => prev.filter((d) => d !== date))
               }
             >
-              Date: {new Date(date).toLocaleDateString()}{" "}
+              <span className="hidden sm:inline">Date:</span> {new Date(date).toLocaleDateString()}{" "}
               <X className="ml-1 size-3" />
             </Button>
           ))}

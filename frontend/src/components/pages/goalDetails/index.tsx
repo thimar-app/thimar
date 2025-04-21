@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ImageUp, Loader, Sparkles } from "lucide-react";
+import { ImageUp, Loader, Sparkles, ChevronLeft } from "lucide-react";
 import { useGoalContext } from "@/context/GoalContext";
 import { useParams, Navigate } from "react-router-dom";
+import { SidebarTrigger } from "@/components/layout/sidebar-trigger";
 
 import {
   Dialog,
@@ -175,172 +176,197 @@ export default function GoalDetails() {
   }
 
   return (
-    <main className="flex flex-col">
-      <GoalHeader title={title} id={goal.id} />
-
-      {/* Hero section */}
-      <section className="flex items-center gap-3">
-        <div
-          style={{
-            backgroundImage: currentGoal?.image_url
-              ? `url(${currentGoal.image_url})`
-              : undefined,
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-          }}
-          className="w-full p-4 relative h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 overflow-hidden"
-        >
-          {currentGoal?.image_url && (
-            <div
-              className="absolute inset-0 bg-black/70 backdrop-blur-xs"
-              aria-hidden="true"
-            />
-          )}
-          <div className="relative z-10 w-full text-center">
-            {isEditingTitle ? (
-              <input
-                type="text"
-                value={title}
-                onChange={handleTitleChange}
-                onBlur={handleTitleBlur}
-                className="font-semibold text-2xl bg-transparent border-none outline-none w-full text-center"
-                autoFocus
-              />
-            ) : (
-              <h2
-                className="font-semibold text-2xl text-center cursor-pointer"
-                onClick={() => setIsEditingTitle(true)}
-              >
-                {title}
-              </h2>
-            )}
-            {isEditingDescription ? (
-              <input
-                type="text"
-                value={description}
-                onChange={handleDescriptionChange}
-                onBlur={handleDescriptionBlur}
-                className="text-muted-foreground bg-transparent border-none outline-none w-full text-center"
-                autoFocus
-              />
-            ) : (
-              <p
-                className="text-muted-foreground cursor-pointer"
-                onClick={() => setIsEditingDescription(true)}
-              >
-                {description}
-              </p>
-            )}
-          </div>
+    <div className="flex flex-col h-full">
+      <header className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="sm:hidden" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/goals")}
+            className="h-8 w-8"
+          >
+            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          </Button>
+          <h1 className="text-sm sm:text-lg font-semibold">{goal?.name}</h1>
+        </div>
+        <div className="flex items-center gap-4">
           <Button
             size="icon"
             variant="outline"
-            className="absolute right-0 m-4 bottom-0 !bg-card/40 hover:!bg-card ml-auto z-10"
-            onClick={() => document.getElementById("image-upload")?.click()}
+            className="h-8 w-8"
           >
-            <ImageUp className="size-6" strokeWidth={1} />
+            <ImageUp className="h-3 w-3 sm:h-4 sm:w-4" strokeWidth={1} />
           </Button>
-          <input
-            id="image-upload"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleImageUpload}
-          />
         </div>
-      </section>
+      </header>
+      <main className="flex flex-col">
+        <GoalHeader title={title} id={goal.id} />
 
-      {/* Generate Task button */}
-      <section className="flex items-center gap-4 my-4">
-        <div className="w-full h-12 bg-muted rounded-lg flex items-center justify-center gap-4 px-5">
-          <div className="w-full h-3 rounded-full bg-muted-foreground/30">
-            <div
-              className="bg-violet-600 h-3 rounded-full transition-all duration-300 ease-in-out"
-              style={{ width: `${currentGoal?.progress || 0}%` }}
+        {/* Hero section */}
+        <section className="flex items-center gap-3">
+          <div
+            style={{
+              backgroundImage: currentGoal?.image_url
+                ? `url(${currentGoal.image_url})`
+                : undefined,
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+            }}
+            className="w-full p-4 relative h-32 sm:h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 overflow-hidden"
+          >
+            {currentGoal?.image_url && (
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-xs"
+                aria-hidden="true"
+              />
+            )}
+            <div className="relative z-10 w-full text-center">
+              {isEditingTitle ? (
+                <input
+                  type="text"
+                  value={title}
+                  onChange={handleTitleChange}
+                  onBlur={handleTitleBlur}
+                  className="font-semibold text-base sm:text-2xl bg-transparent border-none outline-none w-full text-center"
+                  autoFocus
+                />
+              ) : (
+                <h2
+                  className="font-semibold text-base sm:text-2xl text-center cursor-pointer"
+                  onClick={() => setIsEditingTitle(true)}
+                >
+                  {title}
+                </h2>
+              )}
+              {isEditingDescription ? (
+                <input
+                  type="text"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  onBlur={handleDescriptionBlur}
+                  className="text-[10px] sm:text-sm text-muted-foreground bg-transparent border-none outline-none w-full text-center"
+                  autoFocus
+                />
+              ) : (
+                <p
+                  className="text-[10px] sm:text-sm text-muted-foreground cursor-pointer"
+                  onClick={() => setIsEditingDescription(true)}
+                >
+                  {description}
+                </p>
+              )}
+            </div>
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute right-0 m-4 bottom-0 !bg-card/40 hover:!bg-card ml-auto z-10 h-8 w-8"
+              onClick={() => document.getElementById("image-upload")?.click()}
+            >
+              <ImageUp className="h-3 w-3 sm:h-4 sm:w-4" strokeWidth={1} />
+            </Button>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleImageUpload}
             />
           </div>
-          <span>{Math.round(currentGoal?.progress || 0)}%</span>
-        </div>
-        <Button
-          className="!px-12 h-12 bg-violet-600 rounded-lg"
-          onClick={handleGenerateTask}
-          disabled={isGenerateButtonLoading || !currentGoal?.sub_goals?.length}
-        >
-          {isGenerateButtonLoading ? <Loader className="animate-spin" /> : <Sparkles />}
-          Generate Tasks
-        </Button>
-      </section>
+        </section>
 
-      <section className="flex bg-muted items-center gap-4 p-5 rounded-lg">
-        <GoalListView goal={currentGoal} showCompletedTasks />
-      </section>
-
-      {/* AI-Generated Task Dialog */}
-      <Dialog open={aiTaskDialogOpen} onOpenChange={setAiTaskDialogOpen}>
-  <DialogContent className="max-w-[600px] overflow-hidden">
-    <DialogHeader>
-      <DialogTitle className="text-xl font-bold">AI-Generated Task</DialogTitle>
-      <DialogDescription className="text-sm text-muted-foreground">
-        Below is the new task from AI. Choose a sub-goal and date, then accept or regenerate.
-      </DialogDescription>
-    </DialogHeader>
-    {/* Main content area */}
-    <div className="py-4 space-y-6">
-      {/* Display the AI suggestion in a box with strict overflow control */}
-      <div className="bg-card p-4 rounded-md space-y-1 max-w-full">
-        <p className="break-words overflow-hidden text-ellipsis"><strong>TASK NAME:</strong> {aiTaskName}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>DESCRIPTION:</strong> {aiTaskDescription}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>PRIORITY:</strong> {aiTaskPriority}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>REPEAT:</strong> {aiTaskRepeat}</p>
-      </div>
-      {/* SubGoal and Date Inputs in a flex or grid */}
-      <div className="flex flex-col space-y-3">
-        {/* Sub-goal select */}
-        <div className="flex flex-col">
-          <label htmlFor="subgoal-select" className="font-medium mb-1">
-            Attach to Sub-Goal:
-          </label>
-          <select
-            id="subgoal-select"
-            className="border rounded px-2 py-2 text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full truncate"
-            value={selectedSubGoal}
-            onChange={(e) => setSelectedSubGoal(e.target.value)}
+        {/* Generate Task button */}
+        <section className="flex items-center gap-4 my-4">
+          <div className="w-full h-10 sm:h-12 bg-muted rounded-lg flex items-center justify-center gap-4 px-5">
+            <div className="w-full h-2 sm:h-3 rounded-full bg-muted-foreground/30">
+              <div
+                className="bg-violet-600 h-2 sm:h-3 rounded-full transition-all duration-300 ease-in-out"
+                style={{ width: `${currentGoal?.progress || 0}%` }}
+              />
+            </div>
+            <span className="text-xs sm:text-sm">{Math.round(currentGoal?.progress || 0)}%</span>
+          </div>
+          <Button
+            className="!px-8 sm:!px-12 h-10 sm:h-12 bg-violet-600 rounded-lg text-xs sm:text-sm"
+            onClick={handleGenerateTask}
+            disabled={isGenerateButtonLoading || !currentGoal?.sub_goals?.length}
           >
-            <option value="">-- Choose a SubGoal --</option>
-            {currentGoal?.sub_goals?.map((sg: any) => (
-              <option key={sg.id} value={sg.id} className="truncate">
-                {sg.name} (ID: {sg.id})
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Date input */}
-        <div className="flex flex-col">
-          <label className="font-medium mb-1">Date:</label>
-          <input
-            type="date"
-            className="border rounded px-2 py-2 text-sm w-full"
-            value={taskDate}
-            onChange={(e) => setTaskDate(e.target.value)}
-          />
-        </div>
-      </div>
+            {isGenerateButtonLoading ? <Loader className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />}
+            Generate Tasks
+          </Button>
+        </section>
+
+        <section className="flex bg-muted items-center gap-4 p-5 rounded-lg">
+          <GoalListView goal={currentGoal} showCompletedTasks />
+        </section>
+
+        {/* AI-Generated Task Dialog */}
+        <Dialog open={aiTaskDialogOpen} onOpenChange={setAiTaskDialogOpen}>
+          <DialogContent className="max-w-[600px] overflow-hidden">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">AI-Generated Task</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Below is the new task from AI. Choose a sub-goal and date, then accept or regenerate.
+              </DialogDescription>
+            </DialogHeader>
+            {/* Main content area */}
+            <div className="py-4 space-y-6">
+              {/* Display the AI suggestion in a box with strict overflow control */}
+              <div className="bg-card p-4 rounded-md space-y-1 max-w-full">
+                <p className="break-words overflow-hidden text-ellipsis"><strong>TASK NAME:</strong> {aiTaskName}</p>
+                <p className="break-words overflow-hidden text-ellipsis"><strong>DESCRIPTION:</strong> {aiTaskDescription}</p>
+                <p className="break-words overflow-hidden text-ellipsis"><strong>PRIORITY:</strong> {aiTaskPriority}</p>
+                <p className="break-words overflow-hidden text-ellipsis"><strong>REPEAT:</strong> {aiTaskRepeat}</p>
+              </div>
+              {/* SubGoal and Date Inputs in a flex or grid */}
+              <div className="flex flex-col space-y-3">
+                {/* Sub-goal select */}
+                <div className="flex flex-col">
+                  <label htmlFor="subgoal-select" className="font-medium mb-1">
+                    Attach to Sub-Goal:
+                  </label>
+                  <select
+                    id="subgoal-select"
+                    className="border rounded px-2 py-2 text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full truncate"
+                    value={selectedSubGoal}
+                    onChange={(e) => setSelectedSubGoal(e.target.value)}
+                  >
+                    <option value="">-- Choose a SubGoal --</option>
+                    {currentGoal?.sub_goals?.map((sg: any) => (
+                      <option key={sg.id} value={sg.id} className="truncate">
+                        {sg.name} (ID: {sg.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Date input */}
+                <div className="flex flex-col">
+                  <label className="font-medium mb-1">Date:</label>
+                  <input
+                    type="date"
+                    className="border rounded px-2 py-2 text-sm w-full"
+                    value={taskDate}
+                    onChange={(e) => setTaskDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={handleRegenerateTask}>
+                Regenerate
+              </Button>
+              <Button
+                className="bg-violet-600 text-white hover:bg-violet-700"
+                onClick={handleAcceptGeneratedTask}
+                disabled={!selectedSubGoal}
+              >
+                Accept
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
     </div>
-    <DialogFooter className="mt-4">
-      <Button variant="outline" onClick={handleRegenerateTask}>
-        Regenerate
-      </Button>
-      <Button
-        className="bg-violet-600 text-white hover:bg-violet-700"
-        onClick={handleAcceptGeneratedTask}
-        disabled={!selectedSubGoal}
-      >
-        Accept
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-    </main>
   );
 }

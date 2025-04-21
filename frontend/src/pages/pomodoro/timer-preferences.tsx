@@ -73,29 +73,29 @@ export function TimerPreferences({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="space-y-4">
-        <h3 className="text-lg">Set Pomodoro Time</h3>
+    <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="space-y-3 sm:space-y-4">
+        <h3 className="text-base sm:text-lg">Set Pomodoro Time</h3>
         <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={pomodoroInput}
             onChange={(e) => handlePomodoroChange(e.target.value)}
-            className="!bg-card border-none"
+            className="!bg-card border-none h-8 sm:h-10 text-sm sm:text-base"
             min="1"
           />
-          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e] text-xs sm:text-sm">
             minutes
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           {pomodoroOptions.map((option) => (
             <Button
               key={option}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444] h-10 text-xl",
+                "bg-[#333333] hover:bg-[#444444] h-8 sm:h-10 text-base sm:text-xl",
                 settings.pomodoro === option &&
                   "bg-primary hover:!bg-primary/80"
               )}
@@ -107,28 +107,28 @@ export function TimerPreferences({
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-lg">Set Short Break</h3>
+      <div className="space-y-3 sm:space-y-4">
+        <h3 className="text-base sm:text-lg">Set Short Break</h3>
         <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={shortBreakInput}
             onChange={(e) => handleShortBreakChange(e.target.value)}
-            className="!bg-card border-none"
+            className="!bg-card border-none h-8 sm:h-10 text-sm sm:text-base"
             min="1"
           />
-          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e] text-xs sm:text-sm">
             minutes
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           {shortBreakOptions.map((option) => (
             <Button
               key={option}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444] text-white h-10 text-xl",
+                "bg-[#333333] hover:bg-[#444444] text-white h-8 sm:h-10 text-base sm:text-xl",
                 settings.shortBreak === option &&
                   "bg-primary hover:!bg-primary/80"
               )}
@@ -140,28 +140,28 @@ export function TimerPreferences({
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-lg">Set Long Break</h3>
+      <div className="space-y-3 sm:space-y-4">
+        <h3 className="text-base sm:text-lg">Set Long Break</h3>
         <div className="relative flex items-center gap-2">
           <Input
             type="number"
             value={longBreakInput}
             onChange={(e) => handleLongBreakChange(e.target.value)}
-            className="!bg-card border-none"
+            className="!bg-card border-none h-8 sm:h-10 text-sm sm:text-base"
             min="1"
           />
-          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e]">
+          <span className="absolute right-0 m-1.5 rounded text-muted-foreground px-1 bg-[#1e1e1e] text-xs sm:text-sm">
             minutes
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
           {longBreakOptions.map((option) => (
             <Button
               key={option}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444]  h-10 text-xl",
+                "bg-[#333333] hover:bg-[#444444] h-8 sm:h-10 text-base sm:text-xl",
                 settings.longBreak === option &&
                   "bg-primary hover:!bg-primary/80"
               )}

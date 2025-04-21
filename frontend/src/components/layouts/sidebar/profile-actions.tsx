@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ArrowUp,
   BadgeCheck,
@@ -66,10 +66,6 @@ export function ProfileActions() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useAuth();
-
-  useEffect(() => {
-    setIsOpen(true);
-  }, []);
 
   const handleLogout = async () => {
     try {

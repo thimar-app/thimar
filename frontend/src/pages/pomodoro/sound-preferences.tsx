@@ -125,18 +125,18 @@ export function SoundPreferences({
   );
 
   return (
-    <div className="flex flex-col gap-4 h-full">
+    <div className="flex flex-col gap-3 sm:gap-4 h-full">
       {/* Quran Audio Section */}
-      <div className="space-y-4 border-b border-[#333333] pb-6">
-        <div className="flex items-center gap-4">
-          <Volume2 size={20} className="text-gray-400" />
+      <div className="space-y-3 sm:space-y-4 border-b border-[#333333] pb-4 sm:pb-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Volume2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
           <Slider
             value={[quranVolume]}
             min={0}
             max={100}
             step={1}
             onValueChange={handleQuranVolumeChange}
-            className="flex-1 [&>span:first-child]:bg-[#333333] [&>span:first-child]:h-2 [&>span:first-child_span]:bg-[#7c3aed] [&_[role=slider]]:bg-white [&_[role=slider]]:border-none [&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
+            className="flex-1 [&>span:first-child]:bg-[#333333] [&>span:first-child]:h-1.5 sm:[&>span:first-child]:h-2 [&>span:first-child_span]:bg-[#7c3aed] [&_[role=slider]]:bg-white [&_[role=slider]]:border-none [&_[role=slider]]:h-3 sm:[&_[role=slider]]:h-4 [&_[role=slider]]:w-3 sm:[&_[role=slider]]:w-4"
           />
         </div>
 
@@ -145,24 +145,24 @@ export function SoundPreferences({
             value={settings.quranReciter || ""}
             onValueChange={handleReciterChange}
           >
-            <SelectTrigger className="!bg-card w-full">
+            <SelectTrigger className="!bg-card w-full h-8 sm:h-10 text-xs sm:text-sm">
               <SelectValue placeholder="Select Reciter" />
             </SelectTrigger>
             <SelectContent className="bg-[#1e1e1e] border-[#333333] text-white">
-              <div className="px-3 py-2">
+              <div className="px-2 sm:px-3 py-1.5 sm:py-2">
                 <input
                   type="text"
                   placeholder="Search reciter..."
                   value={reciterSearch}
                   onChange={(e) => setReciterSearch(e.target.value)}
-                  className="w-full bg-[#333333] text-white border-none rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
+                  className="w-full bg-[#333333] text-white border-none rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
                 />
               </div>
               {filteredReciters.map((reciter) => (
                 <SelectItem
                   key={reciter.query}
                   value={reciter.query}
-                  className="focus:bg-[#333333] focus:text-white"
+                  className="focus:bg-[#333333] focus:text-white text-xs sm:text-sm"
                 >
                   {reciter.name_en}
                 </SelectItem>
@@ -177,24 +177,24 @@ export function SoundPreferences({
             onValueChange={handleSurahChange}
             disabled={!settings.quranReciter}
           >
-            <SelectTrigger className="!bg-card w-full">
+            <SelectTrigger className="!bg-card w-full h-8 sm:h-10 text-xs sm:text-sm">
               <SelectValue placeholder="Select Surah" />
             </SelectTrigger>
             <SelectContent className="bg-[#1e1e1e] border-[#333333] text-white max-h-[300px]">
-              <div className="px-3 py-2">
+              <div className="px-2 sm:px-3 py-1.5 sm:py-2">
                 <input
                   type="text"
                   placeholder="Search surah..."
                   value={surahSearch}
                   onChange={(e) => setSurahSearch(e.target.value)}
-                  className="w-full bg-[#333333] text-white border-none rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
+                  className="w-full bg-[#333333] text-white border-none rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#7c3aed]"
                 />
               </div>
               {filteredSurahs.map((surah) => (
                 <SelectItem
                   key={surah.query}
                   value={surah.query}
-                  className="focus:bg-[#333333] focus:text-white"
+                  className="focus:bg-[#333333] focus:text-white text-xs sm:text-sm"
                 >
                   {surah.name_en}
                 </SelectItem>
@@ -203,70 +203,64 @@ export function SoundPreferences({
           </Select>
         </div>
 
-        <div className="flex items-center justify-between mt-4">
-          <span className="text-gray-200">Play next surah automatically</span>
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] sm:text-xs">Play during breaks</label>
+          <Switch
+            checked={settings.playDuringBreaks}
+            onCheckedChange={togglePlayDuringBreaks}
+            className="h-3 w-6 sm:h-4 sm:w-7"
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] sm:text-xs">Play next surah</label>
           <Switch
             checked={settings.playNextSurah}
             onCheckedChange={togglePlayNextSurah}
-            className="data-[state=checked]:bg-[#7c3aed]"
+            className="h-3 w-6 sm:h-4 sm:w-7"
           />
         </div>
       </div>
 
-      {/* Natural Sounds Section */}
-      <div className="space-y-4 border-b border-[#333333] pb-6">
-        <div className="flex items-center gap-4">
-          <Volume2 size={20} className="text-gray-400" />
+      {/* Ambient Sounds Section */}
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Volume2 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
           <Slider
             value={[volume]}
             min={0}
             max={100}
             step={1}
             onValueChange={handleVolumeChange}
-            className="flex-1 [&>span:first-child]:bg-[#333333] [&>span:first-child]:h-2 [&>span:first-child_span]:bg-[#7c3aed] [&_[role=slider]]:bg-white [&_[role=slider]]:border-none [&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
+            className="flex-1 [&>span:first-child]:bg-[#333333] [&>span:first-child]:h-1.5 sm:[&>span:first-child]:h-2 [&>span:first-child_span]:bg-[#7c3aed] [&_[role=slider]]:bg-white [&_[role=slider]]:border-none [&_[role=slider]]:h-3 sm:[&_[role=slider]]:h-4 [&_[role=slider]]:w-3 sm:[&_[role=slider]]:w-4"
           />
         </div>
 
-        <div>
-          <h3 className="text-lg mb-4">Select Natural Sound</h3>
-          <div className="grid grid-cols-4 gap-2">
-            {sounds.map((sound) => {
-              const isActive = settings.activeSounds.includes(sound.name);
-              return (
-                <Button
-                  key={sound.name}
-                  variant="ghost"
-                  className={cn(
-                    "bg-card w-full aspect-square p-0 flex flex-col items-center justify-center",
-                    isActive && "bg-[#7c3aed] hover:!bg-[#6d28d9]"
-                  )}
-                  onClick={() => toggleSound(sound.name)}
-                >
-                  <sound.Icon size={24} />
-                </Button>
-              );
-            })}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+          {sounds.map((sound) => (
+            <Button
+              key={sound.name}
+              variant="ghost"
+              className={cn(
+                "bg-[#333333] hover:bg-[#444444] h-7 sm:h-8 text-[10px] sm:text-xs",
+                settings.activeSounds.includes(sound.name) &&
+                  "bg-primary hover:!bg-primary/80"
+              )}
+              onClick={() => toggleSound(sound.name)}
+            >
+              {sound.name}
+            </Button>
+          ))}
         </div>
-      </div>
 
-      {/* Settings Section */}
-      <div className="flex items-center justify-between">
-        <span className="text-gray-200">Play sounds during breaks</span>
-        <Switch
-          checked={settings.playDuringBreaks}
-          onCheckedChange={togglePlayDuringBreaks}
-          className="data-[state=checked]:bg-[#7c3aed]"
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-gray-200">Enable sounds during sessions</span>
-        <Switch
-          checked={settings.soundEnabled}
-          onCheckedChange={toggleSoundEnabled}
-          className="data-[state=checked]:bg-[#7c3aed]"
-        />
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] sm:text-xs">Enable sounds</label>
+          <Switch
+            checked={settings.soundEnabled}
+            onCheckedChange={toggleSoundEnabled}
+            className="h-3 w-6 sm:h-4 sm:w-7"
+          />
+        </div>
       </div>
     </div>
   );

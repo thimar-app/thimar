@@ -23,32 +23,32 @@ export default function GoalHeader({
   const { state } = useSidebar();
   const { deleteGoal } = useGoalContext();
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2">
+    <header className="flex h-12 sm:h-14 shrink-0 items-center gap-2">
       <div className="flex flex-1 items-center gap-2">
-        {state === "collapsed" && <SidebarTrigger />}
+        <SidebarTrigger className="sm:hidden" />
         {state === "collapsed" && (
-          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Separator orientation="vertical" className="mr-2 h-3 sm:h-4" />
         )}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <Link to={"/goals"}>
-                <BreadcrumbPage className="text-muted-foreground hover:text-foreground transition-colors flex gap-2 items-center">
-                  <Goal className="size-4" />
+                <BreadcrumbPage className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors flex gap-1 sm:gap-2 items-center">
+                  <Goal className="h-3 w-3 sm:h-4 sm:w-4" />
                   Goals
                 </BreadcrumbPage>
               </Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
+              <BreadcrumbPage className="text-xs sm:text-sm line-clamp-1 flex items-center gap-1 sm:gap-2">
                 {title}
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="ml-auto px-3">
+      <div className="ml-auto px-2 sm:px-3">
         <HeaderPreference
           onDelete={() => {
             deleteGoal(id);

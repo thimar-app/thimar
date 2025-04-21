@@ -241,9 +241,9 @@ const PrayerListView: React.FC = () => {
     return (
       <li
         ref={connectRef}
-        className={`relative flex group items-center w-full border-b gap-3 pl-3 py-2 ${
+        className={`relative flex group items-center w-full border-b gap-2 sm:gap-3 pl-2 sm:pl-3 py-2 ${
           isDragging
-            ? "opacity-50 "
+            ? "opacity-50"
             : isOver
             ? "bg-sidebar-accent border-violet-600"
             : ""
@@ -254,27 +254,29 @@ const PrayerListView: React.FC = () => {
           variant="ghost"
           className="hover:bg-neutral-200 py-1 rounded absolute cursor-move -left-2 top-[calc(50%-12px)] group-hover:block hidden h-6 w-min text-muted-foreground"
         >
-          <GripVertical />
+          <GripVertical className="h-4 w-4" />
         </Button>
 
         <Checkbox
-          className="rounded-[8px] size-5 border-muted-foreground cursor-pointer"
+          className="rounded-[8px] size-4 sm:size-5 border-muted-foreground cursor-pointer"
           id={`task-${task.id}`}
           checked={task.status}
           onCheckedChange={() => toggleCompletion()}
         />
 
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <label
             htmlFor={`task-${task.id}`}
-            className={
+            className={`text-sm sm:text-base truncate ${
               task.status ? "line-through text-muted-foreground" : ""
-            }
+            }`}
           >
             {task.name}
           </label>
           {task.description && (
-            <span className="text-xs text-muted-foreground">{task.description}</span>
+            <span className="text-xs text-muted-foreground truncate">
+              {task.description}
+            </span>
           )}
         </div>
 
@@ -282,16 +284,16 @@ const PrayerListView: React.FC = () => {
           <Button
             size="icon"
             variant="ghost"
-            className="hover:bg-neutral-200 size-6 text-muted-foreground"
+            className="hover:bg-neutral-200 size-6 sm:size-7 text-muted-foreground"
           >
-            <PenLine />
+            <PenLine className="h-4 w-4" />
           </Button>
           <Button
             size="icon"
             variant="ghost"
-            className="hover:bg-neutral-200 size-6 text-muted-foreground"
+            className="hover:bg-neutral-200 size-6 sm:size-7 text-muted-foreground"
           >
-            <X />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </li>
@@ -333,22 +335,22 @@ const PrayerListView: React.FC = () => {
     return (
       <div
         key={subGoal.id}
-        className={` ${isOver ? "border-blue-500 border" : ""}`}
+        className={`${isOver ? "border-blue-500 border" : ""}`}
       >
         <Collapsible open={isOpen} onOpenChange={onToggle}>
           <CollapsibleTrigger className="w-full">
-            <div className="flex items-center justify-between p-4 pl-2 cursor-pointer">
-              <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between p-3 sm:p-4 pl-2 sm:pl-2 cursor-pointer">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 {isOpen ? (
-                  <ChevronDown className="h-5 w-5" />
+                  <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5" />
                 ) : (
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 )}
-                <h3 className="font-medium">{subGoal.title}</h3>
+                <h3 className="font-medium text-sm sm:text-base">{subGoal.title}</h3>
               </div>
 
               {/* Progress Circle */}
-              <div className="relative w-6 h-6">
+              <div className="relative w-5 h-5 sm:w-6 sm:h-6">
                 <div className="absolute inset-0 rounded-full border-2 border-gray-200"></div>
                 <svg className="absolute inset-0" viewBox="0 0 32 32">
                   <circle
@@ -367,7 +369,7 @@ const PrayerListView: React.FC = () => {
                     className="text-violet-600"
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium">
+                <span className="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-medium">
                   {calculateProgress(subGoal.tasks)}
                 </span>
               </div>
@@ -377,7 +379,7 @@ const PrayerListView: React.FC = () => {
           <CollapsibleContent>
             <CardContent
               ref={contentRef}
-              className={`pl-3 ml-4 border-l-2 ${isOver ? "bg-card" : ""}`}
+              className={`pl-2 sm:pl-3 ml-4 border-l-2 ${isOver ? "bg-card" : ""}`}
             >
               {subGoal.tasks.length > 0 ? (
                 <ul>
@@ -400,7 +402,6 @@ const PrayerListView: React.FC = () => {
                       }}
                       onSave={() => {
                         setShowAddTaskCard(false);
-                        // Refresh tasks after adding a new one
                         fetchTasks();
                       }}
                     />
@@ -410,17 +411,17 @@ const PrayerListView: React.FC = () => {
                         setShowAddTaskCard(true);
                         setSelectedSubGoalId(subGoal.id);
                       }}
-                      variant={"ghost"}
-                      className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
+                      variant="ghost"
+                      className="mt-2 px-3 gap-2 sm:gap-3 text-muted-foreground w-full justify-start cursor-pointer"
                     >
-                      <CirclePlus className="!size-5" strokeWidth={1} />
-                      <span className="">Add Task</span>
+                      <CirclePlus className="!size-4 sm:!size-5" strokeWidth={1} />
+                      <span className="text-sm">Add Task</span>
                     </Button>
                   )}
                 </ul>
               ) : (
                 <div className="py-4">
-                  <p className="text-gray-500 text-sm italic py-2">
+                  <p className="text-gray-500 text-xs sm:text-sm italic py-2">
                     Drop tasks here
                   </p>
                   <Button
@@ -428,11 +429,11 @@ const PrayerListView: React.FC = () => {
                       setShowAddTaskCard(true);
                       setSelectedSubGoalId(subGoal.id);
                     }}
-                    variant={"ghost"}
-                    className="mt-2 px-3 gap-3 text-muted-foreground w-full justify-baseline cursor-pointer"
+                    variant="ghost"
+                    className="mt-2 px-3 gap-2 sm:gap-3 text-muted-foreground w-full justify-start cursor-pointer"
                   >
-                    <CirclePlus className="!size-5" strokeWidth={1} />
-                    <span className="">Add Task</span>
+                    <CirclePlus className="!size-4 sm:!size-5" strokeWidth={1} />
+                    <span className="text-sm">Add Task</span>
                   </Button>
                 </div>
               )}
@@ -457,7 +458,7 @@ const PrayerListView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-48 sm:h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
       </div>
     );
@@ -465,7 +466,7 @@ const PrayerListView: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div>
+      <div className="space-y-2 sm:space-y-4">
         {subGoals.map((subGoal) => (
           <DroppableSubGoal
             key={subGoal.id}

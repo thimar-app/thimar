@@ -14,7 +14,7 @@ interface SimpleListViewProps {
   showGoals?: boolean;
   todayTasks?: boolean;
   onEditTask?: (task: Task) => void;
-  tasks?: Task[]; // Added optional tasks prop
+  tasks?: Task[];
 }
 
 // Utility function to check if a date is today (ignores time)
@@ -32,7 +32,7 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
   showCompletedTasks,
   todayTasks = false,
   onEditTask,
-  tasks: propTasks, // Renamed to propTasks to avoid conflict
+  tasks: propTasks,
 }) => {
   const {
     tasks: contextTasks,
@@ -68,9 +68,9 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full">
+      <div className="w-full p-2 sm:p-4">
         {filteredTasks.length > 0 ? (
-          <ul className="divide-y">
+          <ul className="divide-y space-y-2 sm:space-y-4">
             {filteredTasks.map((task, index) =>
               editingTask?.id === task.id ? (
                 <EditTaskCard
@@ -93,19 +93,21 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
             )}
           </ul>
         ) : (
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-muted-foreground py-4 sm:py-6">
             {todayTasks ? (
-              <div className="text-center text-muted-foreground">
-                <p className="font-semibold">
+              <div className="space-y-2 sm:space-y-3">
+                <p className="font-semibold text-base sm:text-lg">
                   What do you need to get done today?
                 </p>
-                <p className="text-sm">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   By default, tasks added here will be scheduled for today.
                 </p>
               </div>
             ) : (
-              <div className="text-center text-muted-foreground">
-                <p className="font-semibold">What do you need to get done?</p>
+              <div>
+                <p className="font-semibold text-base sm:text-lg">
+                  What do you need to get done?
+                </p>
               </div>
             )}
           </div>
@@ -119,13 +121,13 @@ const SimpleListView: React.FC<SimpleListViewProps> = ({
         )}
         <Button
           variant="ghost"
-          className={`mt-2 px-3 gap-3 text-muted-foreground ${
-            filteredTasks.length > 0 ? "justify-baseline" : "justify-center"
+          className={`mt-4 sm:mt-6 px-3 gap-2 sm:gap-3 text-muted-foreground ${
+            filteredTasks.length > 0 ? "justify-start" : "justify-center"
           } w-full cursor-pointer`}
           onClick={() => setIsAddingTask(true)}
         >
-          <CirclePlus className="size-5" strokeWidth={1} />
-          Add Task
+          <CirclePlus className="size-4 sm:size-5" strokeWidth={1} />
+          <span className="text-sm sm:text-base">Add Task</span>
         </Button>
       </div>
     </DndProvider>

@@ -12,19 +12,19 @@ import { CheckCircle2 } from "lucide-react";
 export default function TasksHeader() {
   const { state } = useSidebar();
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2">
+    <header className="flex h-14 shrink-0 items-center gap-2 px-4 sm:px-6 w-full">
       <div className="flex flex-1 items-center gap-2">
-        {state === "collapsed" && <SidebarTrigger />}
+        <SidebarTrigger className="md:hidden" />
         {state === "collapsed" && (
-          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Separator orientation="vertical" className="h-4" />
         )}
 
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
-                <CheckCircle2 className="size-4" />
-                Tasks
+              <BreadcrumbPage className="flex items-center gap-2">
+                <CheckCircle2 className="size-4 sm:size-5" />
+                <span className="text-base sm:text-lg font-semibold">Tasks</span>
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>

@@ -262,7 +262,7 @@ export default function GoalDetails() {
       <GoalHeader title={title} id={goal.id} />
 
       {/* Hero section */}
-      <section className="flex items-center gap-3">
+      <section className="flex items-center gap-3 p-2 sm:p-4">
         <div
           style={{
             backgroundImage: currentGoal?.image_url
@@ -272,7 +272,7 @@ export default function GoalDetails() {
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
           }}
-          className="w-full p-4 relative h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 overflow-hidden"
+          className="w-full p-3 sm:p-4 relative h-32 sm:h-40 bg-muted rounded-lg flex flex-col items-center justify-center gap-1.5 sm:gap-2 overflow-hidden"
         >
           {currentGoal?.image_url && (
             <div
@@ -287,12 +287,12 @@ export default function GoalDetails() {
                 value={title}
                 onChange={handleTitleChange}
                 onBlur={handleTitleBlur}
-                className="font-semibold text-2xl bg-transparent border-none outline-none w-full text-center"
+                className="font-semibold text-base sm:text-2xl bg-transparent border-none outline-none w-full text-center"
                 autoFocus
               />
             ) : (
               <h2
-                className="font-semibold text-2xl text-center cursor-pointer"
+                className="font-semibold text-base sm:text-2xl text-center cursor-pointer"
                 onClick={() => setIsEditingTitle(true)}
               >
                 {title}
@@ -304,12 +304,12 @@ export default function GoalDetails() {
                 value={description}
                 onChange={handleDescriptionChange}
                 onBlur={handleDescriptionBlur}
-                className="text-muted-foreground bg-transparent border-none outline-none w-full text-center"
+                className="text-[10px] sm:text-sm text-muted-foreground bg-transparent border-none outline-none w-full text-center"
                 autoFocus
               />
             ) : (
               <p
-                className="text-muted-foreground cursor-pointer"
+                className="text-[10px] sm:text-sm text-muted-foreground cursor-pointer"
                 onClick={() => setIsEditingDescription(true)}
               >
                 {description}
@@ -319,10 +319,10 @@ export default function GoalDetails() {
           <Button
             size="icon"
             variant="outline"
-            className="absolute right-0 m-4 bottom-0 !bg-card/40 hover:!bg-card ml-auto z-10"
+            className="absolute right-0 m-2 sm:m-4 bottom-0 !bg-card/40 hover:!bg-card ml-auto z-10 h-7 w-7 sm:h-8 sm:w-8"
             onClick={() => document.getElementById("image-upload")?.click()}
           >
-            <ImageUp className="size-6" strokeWidth={1} />
+            <ImageUp className="h-3 w-3 sm:h-4 sm:w-4" strokeWidth={1} />
           </Button>
           <input
             id="image-upload"
@@ -335,128 +335,148 @@ export default function GoalDetails() {
       </section>
 
       {/* Generate Task button */}
-      <section className="flex items-center gap-4 my-4">
-        <div className="w-full h-12 bg-muted rounded-lg flex items-center justify-center gap-4 px-5">
-          <div className="w-full h-3 rounded-full bg-muted-foreground/30">
+      <section className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 my-2 sm:my-4 p-2 sm:p-4">
+        <div className="w-full h-10 sm:h-12 bg-muted rounded-lg flex items-center justify-center gap-2 sm:gap-4 px-3 sm:px-5">
+          <div className="w-full h-2 sm:h-3 rounded-full bg-muted-foreground/30">
             <div
-              className="bg-violet-600 h-3 rounded-full transition-all duration-300 ease-in-out"
+              className="bg-violet-600 h-2 sm:h-3 rounded-full transition-all duration-300 ease-in-out"
               style={{ width: `${currentGoal?.progress || 0}%` }}
             />
           </div>
-          <span>{Math.round(currentGoal?.progress || 0)}%</span>
+          <span className="text-xs sm:text-sm">{Math.round(currentGoal?.progress || 0)}%</span>
         </div>
         <Button
-          className="!px-12 h-12 bg-violet-600 rounded-lg"
+          className="w-full sm:w-auto !px-4 sm:!px-12 h-10 sm:h-12 bg-violet-600 rounded-lg text-xs sm:text-sm"
           onClick={handleGenerateTask}
           disabled={isGenerateButtonLoading || !currentGoal?.sub_goals?.length}
         >
-          {isGenerateButtonLoading ? <Loader className="animate-spin" /> : <Sparkles />}
-          Generate Tasks 
+          {isGenerateButtonLoading ? (
+            <Loader className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-1 sm:mr-2" />
+          ) : (
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+          )}
+          Generate Tasks
         </Button>
       </section>
 
-      <section className="flex bg-muted items-center gap-4 p-5 rounded-lg">
+      <section className="flex bg-muted items-center gap-2 sm:gap-4 p-3 sm:p-5 rounded-lg">
         <GoalListView goal={currentGoal} showCompletedTasks />
       </section>
 
       {/* AI-Generated Task Dialog */}
       <Dialog open={aiTaskDialogOpen} onOpenChange={setAiTaskDialogOpen}>
-  <DialogContent className="max-w-[600px] overflow-hidden">
-    <DialogHeader>
-      <DialogTitle className="text-xl font-bold">AI-Generated Task</DialogTitle>
-      <DialogDescription className="text-sm text-muted-foreground">
-        Below is the new task from AI. Choose a sub-goal and date, then accept or regenerate.
-      </DialogDescription>
-    </DialogHeader>
-    {/* Main content area */}
-    <div className="py-4 space-y-6">
-      {/* Display the AI suggestion in a box with strict overflow control */}
-      <div className="bg-card p-4 rounded-md space-y-1 max-w-full">
-        <p className="break-words overflow-hidden text-ellipsis"><strong>TASK NAME:</strong> {aiTaskName}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>DESCRIPTION:</strong> {aiTaskDescription}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>PRIORITY:</strong> {aiTaskPriority}</p>
-        <p className="break-words overflow-hidden text-ellipsis"><strong>REPEAT:</strong> {aiTaskRepeat}</p>
-        {aiTaskPrayerTime && (
-          <>
-            <p className="break-words overflow-hidden text-ellipsis"><strong>SUGGESTED PRAYER TIME:</strong> {aiTaskPrayerTime}</p>
-            <p className="break-words overflow-hidden text-ellipsis"><strong>PRAYER CONTEXT:</strong> {aiTaskPrayerContext}</p>
-          </>
-        )}
-      </div>
-      {/* SubGoal and Date Inputs in a flex or grid */}
-      <div className="flex flex-col space-y-3">
-        {/* Sub-goal select */}
-        <div className="flex flex-col">
-          <label htmlFor="subgoal-select" className="font-medium mb-1">
-            Attach to Sub-Goal:
-          </label>
-          <select
-            id="subgoal-select"
-            className="border rounded px-2 py-2 text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full truncate"
-            value={selectedSubGoal}
-            onChange={(e) => setSelectedSubGoal(e.target.value)}
-          >
-            <option value="">-- Choose a SubGoal --</option>
-            {currentGoal?.sub_goals?.map((sg: any) => (
-              <option key={sg.id} value={sg.id} className="truncate">
-                {sg.name} (ID: {sg.id})
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* Date input */}
-        <div className="flex flex-col">
-          <label className="font-medium mb-1">Date:</label>
-          <input
-            type="date"
-            className="border rounded px-2 py-2 text-sm w-full"
-            value={taskDate}
-            onChange={(e) => setTaskDate(e.target.value)}
-          />
-        </div>
-        {/* Prayer time select */}
-        <div className="flex flex-col">
-          <label htmlFor="prayer-time-select" className="font-medium mb-1">
-            Prayer Time:
-          </label>
-          <select
-            id="prayer-time-select"
-            className="border rounded px-2 py-2 text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full"
-            value={selectedPrayerId || ""}
-            onChange={(e) => setSelectedPrayerId(e.target.value || null)}
-          >
-            <option value="">-- Select Prayer Time --</option>
-            {prayers.map((prayer) => (
-              <option key={prayer.id} value={prayer.id}>
-                {prayer.name}
-              </option>
-            ))}
-            {aiTaskPrayerTime && (
-              <option value={aiTaskPrayerTime.toLowerCase()}>
-                {aiTaskPrayerTime} (AI Suggested)
-              </option>
-            )}
-          </select>
-          {aiTaskPrayerContext && (
-            <p className="text-xs text-muted-foreground mt-1">{aiTaskPrayerContext}</p>
-          )}
-        </div>
-      </div>
-    </div>
-    <DialogFooter className="mt-4">
-      <Button variant="outline" onClick={handleRegenerateTask}>
-        Regenerate
-      </Button>
-      <Button
-        className="bg-violet-600 text-white hover:bg-violet-700"
-        onClick={handleAcceptGeneratedTask}
-        disabled={!selectedSubGoal}
-      >
-        Accept
-      </Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+        <DialogContent className="max-w-[600px] w-[95vw] sm:w-auto overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-base sm:text-xl font-bold">AI-Generated Task</DialogTitle>
+            <DialogDescription className="text-[10px] sm:text-sm text-muted-foreground">
+              Below is the new task from AI. Choose a sub-goal and date, then accept or regenerate.
+            </DialogDescription>
+          </DialogHeader>
+          {/* Main content area */}
+          <div className="py-2 sm:py-4 space-y-3 sm:space-y-6">
+            {/* Display the AI suggestion in a box with strict overflow control */}
+            <div className="bg-card p-2 sm:p-4 rounded-md space-y-1 max-w-full">
+              <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                <strong className="text-[10px] sm:text-sm">TASK NAME:</strong> {aiTaskName}
+              </p>
+              <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                <strong className="text-[10px] sm:text-sm">DESCRIPTION:</strong> {aiTaskDescription}
+              </p>
+              <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                <strong className="text-[10px] sm:text-sm">PRIORITY:</strong> {aiTaskPriority}
+              </p>
+              <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                <strong className="text-[10px] sm:text-sm">REPEAT:</strong> {aiTaskRepeat}
+              </p>
+              {aiTaskPrayerTime && (
+                <>
+                  <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                    <strong className="text-[10px] sm:text-sm">SUGGESTED PRAYER TIME:</strong> {aiTaskPrayerTime}
+                  </p>
+                  <p className="text-[10px] sm:text-sm break-words overflow-hidden text-ellipsis">
+                    <strong className="text-[10px] sm:text-sm">PRAYER CONTEXT:</strong> {aiTaskPrayerContext}
+                  </p>
+                </>
+              )}
+            </div>
+            {/* SubGoal and Date Inputs in a flex or grid */}
+            <div className="flex flex-col space-y-2 sm:space-y-3">
+              {/* Sub-goal select */}
+              <div className="flex flex-col">
+                <label htmlFor="subgoal-select" className="text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">
+                  Attach to Sub-Goal:
+                </label>
+                <select
+                  id="subgoal-select"
+                  className="border rounded px-2 py-1.5 sm:py-2 text-[10px] sm:text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full truncate"
+                  value={selectedSubGoal}
+                  onChange={(e) => setSelectedSubGoal(e.target.value)}
+                >
+                  <option value="">-- Choose a SubGoal --</option>
+                  {currentGoal?.sub_goals?.map((sg: any) => (
+                    <option key={sg.id} value={sg.id} className="truncate">
+                      {sg.name} (ID: {sg.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* Date input */}
+              <div className="flex flex-col">
+                <label className="text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">Date:</label>
+                <input
+                  type="date"
+                  className="border rounded px-2 py-1.5 sm:py-2 text-[10px] sm:text-sm w-full"
+                  value={taskDate}
+                  onChange={(e) => setTaskDate(e.target.value)}
+                />
+              </div>
+              {/* Prayer time select */}
+              <div className="flex flex-col">
+                <label htmlFor="prayer-time-select" className="text-[10px] sm:text-sm font-medium mb-0.5 sm:mb-1">
+                  Prayer Time:
+                </label>
+                <select
+                  id="prayer-time-select"
+                  className="border rounded px-2 py-1.5 sm:py-2 text-[10px] sm:text-sm bg-white text-black dark:bg-gray-800 dark:text-white w-full"
+                  value={selectedPrayerId || ""}
+                  onChange={(e) => setSelectedPrayerId(e.target.value || null)}
+                >
+                  <option value="">-- Select Prayer Time --</option>
+                  {prayers.map((prayer) => (
+                    <option key={prayer.id} value={prayer.id}>
+                      {prayer.name}
+                    </option>
+                  ))}
+                  {aiTaskPrayerTime && (
+                    <option value={aiTaskPrayerTime.toLowerCase()}>
+                      {aiTaskPrayerTime} (AI Suggested)
+                    </option>
+                  )}
+                </select>
+                {aiTaskPrayerContext && (
+                  <p className="text-[8px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">{aiTaskPrayerContext}</p>
+                )}
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="mt-2 sm:mt-4 flex flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleRegenerateTask}
+              className="w-full sm:w-auto text-[10px] sm:text-sm h-8 sm:h-10"
+            >
+              Regenerate
+            </Button>
+            <Button
+              className="w-full sm:w-auto bg-violet-600 text-white hover:bg-violet-700 text-[10px] sm:text-sm h-8 sm:h-10"
+              onClick={handleAcceptGeneratedTask}
+              disabled={!selectedSubGoal}
+            >
+              Accept
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

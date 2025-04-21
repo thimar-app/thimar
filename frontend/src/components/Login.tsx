@@ -75,7 +75,7 @@ const Login: React.FC = () => {
       // Fetch user data and update context
       const userData = await getUserProfile();
       setCurrentUser(userData);
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       const apiError = error as ApiError;
       setErrors(apiError.detail ? { general: apiError.detail } : apiError);
