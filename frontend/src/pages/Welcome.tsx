@@ -101,24 +101,24 @@ export default function ThimarLanding() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-white overflow-x-hidden w-full">
       {/* Navigation */}
-      <nav className="bg-white shadow sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <nav className="bg-white shadow sticky top-0 z-50 w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 max-w-7xl">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <img src="/logo.png" alt="Thimar Logo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg" />
-              <span className="font-bold text-xl sm:text-2xl text-purple-800">Thimar</span>
+              <img src="/logo.png" alt="Thimar Logo" className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg" />
+              <span className="font-bold text-lg sm:text-xl md:text-2xl text-purple-800">Thimar</span>
             </div>
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-purple-800 text-sm lg:text-base">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-purple-800 text-sm lg:text-base">Pricing</a>
-              <button className="bg-purple-100 text-purple-800 px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg font-medium hover:bg-purple-200 text-sm lg:text-base transition-colors">
+              <a href="#features" className="text-gray-600 hover:text-purple-800 text-sm md:text-base">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-purple-800 text-sm md:text-base">Pricing</a>
+              <button className="bg-purple-100 text-purple-800 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium hover:bg-purple-200 text-sm md:text-base transition-colors">
                 <Link to="/login">Sign In</Link>
               </button>
-              <button className="bg-purple-800 text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg font-medium hover:bg-purple-900 text-sm lg:text-base transition-colors">
+              <button className="bg-purple-800 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-medium hover:bg-purple-900 text-sm md:text-base transition-colors">
                 <Link to="/register">Get Started</Link>
               </button>
             </div>
@@ -172,16 +172,16 @@ export default function ThimarLanding() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 max-w-7xl">
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-full md:w-1/2 md:pr-6 lg:pr-12 mb-8 md:mb-0">
             <div className="inline-block bg-purple-100 px-3 py-1 rounded-full text-purple-800 font-medium text-xs sm:text-sm mb-4 sm:mb-6">
               ✨ Now in Public Beta
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6">
               Productivity with <span className="text-purple-800">Islamic Purpose</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8">
               Thimar combines AI-powered productivity tools with Islamic principles to help you achieve balance and excellence in both worlds. Plan around prayer times, track worship goals, and stay focused with the only productivity app designed specifically for Muslims.
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
@@ -194,10 +194,9 @@ export default function ThimarLanding() {
             </div>
           </div>
           <div className="w-full md:w-1/2 mt-8 md:mt-0">
-            <div className="relative max-w-md sm:max-w-lg mx-auto md:mx-0">
+            <div className="relative max-w-md sm:max-w-lg mx-auto md:mx-0 md:max-w-full">
               <div className="absolute inset-0 bg-purple-300 rounded-3xl transform rotate-3"></div>
               <div className="bg-white p-1 rounded-3xl shadow-xl transform -rotate-2 relative">
-                {/* Looping video with no controls */}
                 <video 
                   className="rounded-2xl w-full h-auto"
                   autoPlay 
@@ -206,7 +205,6 @@ export default function ThimarLanding() {
                   playsInline
                 >
                   <source src="https://fagzgyrlxrpvniypexil.supabase.co/storage/v1/object/public/marketing//Thimar_overview1.mp4" type="video/mp4" />
-                  {/* Fallback image if video fails to load */}
                   <img 
                     src="/api/placeholder/600/400" 
                     alt="Thimar App Interface" 
@@ -220,11 +218,11 @@ export default function ThimarLanding() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="bg-purple-100 py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Designed for the Muslim Lifestyle</h2>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+      <section id="features" className="bg-purple-100 py-8 sm:py-12 md:py-16 lg:py-20 w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Designed for the Muslim Lifestyle</h2>
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
               Every feature in Thimar is built to help you excel in both productivity and faith
             </p>
           </div>
@@ -236,8 +234,8 @@ export default function ThimarLanding() {
                 <div className="bg-purple-100 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg mb-3 sm:mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2">{feature.title}</h3>
-                <p className="text-sm sm:text-base text-gray-600">{feature.description}</p>
+                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1 sm:mb-2">{feature.title}</h3>
+                <p className="text-xs sm:text-sm md:text-base text-gray-600">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -245,13 +243,12 @@ export default function ThimarLanding() {
       </section>
 
       {/* App Preview */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 max-w-7xl">
         <div className="flex flex-col md:flex-row items-center">
           <div className="w-full md:w-1/2 mb-8 md:mb-0">
-            <div className="relative max-w-md sm:max-w-lg mx-auto md:mx-0">
+            <div className="relative max-w-md sm:max-w-lg mx-auto md:mx-0 md:max-w-full">
               <div className="absolute inset-0 bg-purple-300 rounded-3xl transform -rotate-3"></div>
               <div className="bg-white p-1 rounded-3xl shadow-xl transform rotate-2 relative">
-                {/* Looping video showing task management */}
                 <video 
                   className="rounded-2xl w-full h-auto"
                   autoPlay 
@@ -260,7 +257,6 @@ export default function ThimarLanding() {
                   playsInline
                 >
                   <source src="https://fagzgyrlxrpvniypexil.supabase.co/storage/v1/object/public/marketing//Thimar_overview2.mp4" type="video/mp4" />
-                  {/* Fallback image if video fails to load */}
                   <img 
                     src="/api/placeholder/600/400" 
                     alt="Thimar Task Management" 
@@ -271,7 +267,7 @@ export default function ThimarLanding() {
             </div>
           </div>
           <div className="w-full md:w-1/2 mt-8 md:mt-0 md:pl-6 lg:pl-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">
               AI that Understands Your Islamic Priorities
             </h2>
             <div className="space-y-4 sm:space-y-6">
@@ -280,8 +276,8 @@ export default function ThimarLanding() {
                   <CheckIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-800" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-1">Prayer-First Scheduling</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Never miss a prayer with automatic schedule adjustments around salah times</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1">Prayer-First Scheduling</h3>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600">Never miss a prayer with automatic schedule adjustments around salah times</p>
                 </div>
               </div>
               
@@ -290,8 +286,8 @@ export default function ThimarLanding() {
                   <CheckIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-800" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-1">Worship Tracking</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Set and achieve goals for Quran reading, dhikr, and voluntary prayers</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1">Worship Tracking</h3>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600">Set and achieve goals for Quran reading, dhikr, and voluntary prayers</p>
                 </div>
               </div>
               
@@ -300,8 +296,8 @@ export default function ThimarLanding() {
                   <CheckIcon className="w-5 h-5 sm:w-6 sm:h-6 text-purple-800" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-1">Islamic Deep Work</h3>
-                  <p className="text-sm sm:text-base text-gray-600">Focus better with Pomodoro timers featuring Quran recitation during breaks</p>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1">Islamic Deep Work</h3>
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600">Focus better with Pomodoro timers featuring Quran recitation during breaks</p>
                 </div>
               </div>
             </div>
@@ -310,15 +306,15 @@ export default function ThimarLanding() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
-        <div className="text-center mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Simple, Blessed Pricing</h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+      <section id="pricing" className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 lg:py-20 max-w-7xl">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Simple, Blessed Pricing</h2>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
             Choose the plan that helps you grow in both worlds
           </p>
         </div>
         
-        <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8">
           {plans.map((plan, index) => (
             <div 
               key={index}
@@ -337,16 +333,16 @@ export default function ThimarLanding() {
                 </div>
               )}
               <div className="relative">
-                <h3 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2">{plan.name}</h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">{plan.description}</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{plan.name}</h3>
+                <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-3 sm:mb-4">{plan.description}</p>
                 <div className="mb-4 sm:mb-6">
-                  <span className="text-2xl sm:text-4xl font-bold">{plan.soon ? '$$$' : plan.price}</span>
+                  <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">{plan.soon ? '$$$' : plan.price}</span>
                   <span className="text-gray-500">/month</span> 
                 </div>
                 
                 <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center text-sm sm:text-base">
+                    <li key={i} className="flex items-center text-xs sm:text-sm md:text-base">
                       <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-800 mr-2" />
                       <span>{feature}</span>
                     </li>
@@ -371,22 +367,24 @@ export default function ThimarLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-purple-800 text-white py-12 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">Begin Your Journey Towards Balanced Productivity</h2>
-          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto">
+      <section className="bg-purple-800 text-white py-8 sm:py-12 md:py-16 w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-7xl">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">Begin Your Journey Towards Balanced Productivity</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto">
             Join thousands of Muslims who have transformed their productivity while strengthening their faith with Thimar.
           </p>
-          <button className="bg-white text-purple-800 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg hover:bg-purple-100 transition-colors">
+          <button className="bg-white text-purple-800 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-lg font-medium text-sm sm:text-base md:text-lg hover:bg-purple-100 transition-colors">
             <Link to="/register">Start Your Free Trial</Link>
           </button>
-          <p className="mt-3 sm:mt-4 text-purple-200 text-sm sm:text-base">No credit card required. 30-day free trial.</p>
+          <p className="mt-3 sm:mt-4 text-purple-200 text-xs sm:text-sm md:text-base">No credit card required. 30-day free trial.</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-4 sm:py-6 text-center">
-        <p className="text-gray-400 text-sm sm:text-base">© 2025 Thimar. All rights reserved.</p>  
+      <footer className="bg-gray-900 text-white py-4 sm:py-6 text-center w-full">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <p className="text-gray-400 text-xs sm:text-sm md:text-base">© 2025 Thimar. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );
