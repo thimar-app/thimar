@@ -492,14 +492,14 @@ export function PomodoroTimer() {
             }
           }}
         >
-          <svg width="240" height="240" viewBox="0 0 280 280" className="w-[240px] h-[240px] sm:w-[280px] sm:h-[280px]">
+          <svg width="180" height="180" viewBox="0 0 280 280" className="w-[180px] h-[180px] sm:w-[240px] sm:h-[240px]">
             <circle
               cx="140"
               cy="140"
               r="120"
               fill="none"
               stroke="#333333"
-              strokeWidth="8"
+              strokeWidth="6"
             />
             <circle
               cx="140"
@@ -507,7 +507,7 @@ export function PomodoroTimer() {
               r="120"
               fill="none"
               stroke="#7c3aed"
-              strokeWidth="8"
+              strokeWidth="6"
               strokeDasharray={circumference}
               strokeDashoffset={
                 circumference - (circumference * progress) / 100
@@ -517,10 +517,10 @@ export function PomodoroTimer() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-4xl sm:text-6xl p-1 sm:p-2 rounded-lg hover:bg-card font-semibold">
+            <span className="text-3xl sm:text-5xl p-1 sm:p-2 rounded-lg hover:bg-card font-semibold">
               {formatTime(timeLeft)}
             </span>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">
+            <span className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2">
               {timerStatus === "running"
                 ? "running"
                 : timerStatus === "completed"

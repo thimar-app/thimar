@@ -139,12 +139,12 @@ export default function HomePrayerTimeSection() {
       </div>
 
       {/* Next Prayer Section - Hidden on Mobile */}
-      <div className="hidden sm:block w-full sm:min-w-72 h-72 bg-muted rounded-lg flex items-center justify-center p-4">
+      <div className="hidden sm:block w-full sm:w-64 h-72 bg-muted rounded-lg flex items-center justify-center p-4">
         <div
           style={style}
-          className="relative rounded-[100%] bg-white size-40 sm:size-56 flex items-center justify-center"
+          className="relative rounded-[100%] bg-white size-40 sm:size-48 flex items-center justify-center"
         >
-          <div className="rounded-[100%] bg-muted size-[9.5rem] sm:size-[13.3rem] flex flex-col items-center justify-center gap-2">
+          <div className="rounded-[100%] bg-muted size-[9.5rem] sm:size-[11.5rem] flex flex-col items-center justify-center gap-2">
             <span className="text-sm sm:text-base font-medium">{nextPrayerName} Prayer After</span>
             <span className="text-2xl sm:text-3xl font-semibold">{timeUntilNextPrayer}</span>
           </div>

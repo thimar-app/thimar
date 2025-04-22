@@ -236,19 +236,20 @@ export function SoundPreferences({
           />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-3 gap-1.5 sm:gap-2">
           {sounds.map((sound) => (
             <Button
               key={sound.name}
               variant="ghost"
               className={cn(
-                "bg-[#333333] hover:bg-[#444444] h-7 sm:h-8 text-[10px] sm:text-xs",
+                "bg-[#333333] hover:bg-[#444444] h-7 sm:h-8 w-7 sm:w-auto p-0 sm:px-3",
                 settings.activeSounds.includes(sound.name) &&
                   "bg-primary hover:!bg-primary/80"
               )}
               onClick={() => toggleSound(sound.name)}
             >
-              {sound.name}
+              <sound.Icon className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+              <span className="hidden sm:inline text-xs">{sound.name}</span>
             </Button>
           ))}
         </div>

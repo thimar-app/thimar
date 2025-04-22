@@ -229,40 +229,41 @@ export default function Goals() {
     <main className="flex flex-col">
       <GoalsHeader />
       <div className="flex flex-col gap-4 p-4">
-        {/* Progress Card */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm sm:text-lg font-medium">Overall Progress</h2>
-            <span className="text-xs sm:text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
-          </div>
-          <Progress value={overallProgress} className="h-1.5 sm:h-2" />
-        </Card>
+        {/* Progress Card and Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <Card className="flex-1 p-3 sm:p-4 w-full">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <h2 className="text-sm sm:text-base font-medium">Overall Progress</h2>
+              <span className="text-xs sm:text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
+            </div>
+            <Progress value={overallProgress} className="h-1 sm:h-1.5" />
+          </Card>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button 
-            variant="outline" 
-            onClick={handleGenerateWithAI}
-            disabled={isGenerateButtonLoading}
-            className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm"
-          >
-            {isGenerateButtonLoading ? (
-              <Loader className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-            ) : (
-              <Sparkles className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            )}
-            Generate with AI
-          </Button>
-          <AddGoalDialog>
-            <Button className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm">
-              <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-              Add Goal
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleGenerateWithAI}
+              disabled={isGenerateButtonLoading}
+              className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm"
+            >
+              {isGenerateButtonLoading ? (
+                <Loader className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              )}
+              Generate with AI
             </Button>
-          </AddGoalDialog>
+            <AddGoalDialog>
+              <Button className="w-full sm:w-auto h-8 sm:h-10 text-xs sm:text-sm">
+                <Plus className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                Add Goal
+              </Button>
+            </AddGoalDialog>
+          </div>
         </div>
 
         {/* Goals Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {isLoadingPaginated ? (
             <GoalSkeletonGrid />
           ) : paginatedGoals?.length === 0 ? (
@@ -284,7 +285,7 @@ export default function Goals() {
               <div
                 key={goal.id}
                 onClick={() => handleGoalClick(goal)}
-                className="cursor-pointer"
+                className="cursor-pointer pb-4"
               >
                 <GoalCard
                   title={goal.name}
