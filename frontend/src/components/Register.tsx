@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerUser, loginUser, getUserProfile, UserData, ApiError } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, User, Mail, Lock, ArrowRight, Sun, Moon, MapPin } from 'lucide-react';
+import { AlertCircle, User, Mail, Lock, ArrowRight, Sun, Moon, MapPin, Search } from 'lucide-react';
 
 interface RegisterFormData {
   username: string;
@@ -11,6 +11,7 @@ interface RegisterFormData {
   password2: string;
   latitude: string;
   longitude: string;
+  location: string;
 }
 
 const Register: React.FC = () => {
@@ -20,12 +21,17 @@ const Register: React.FC = () => {
     password: '',
     password2: '',
     latitude: '',
-    longitude: ''
+    longitude: '',
+    location: ''
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [useLocation, setUseLocation] = useState<boolean>(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [locationSearch, setLocationSearch] = useState<string>('');
+  const [locationResults, setLocationResults] = useState<any[]>([]);
+  const [showLocationResults, setShowLocationResults] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
 
@@ -46,41 +52,82 @@ const Register: React.FC = () => {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  const handleLocationToggle = (): void => {
-    if (!useLocation) {
-      // Request location when toggling on
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setFormData({
-              ...formData,
-              latitude: position.coords.latitude.toString(),
-              longitude: position.coords.longitude.toString()
-            });
-          },
-          (error) => {
-            console.error("Error obtaining location:", error);
-            setErrors({
-              ...errors,
-              location: "Failed to get your location. Please enter coordinates manually."
-            });
-          }
+  // Debounced search function
+  const debouncedSearch = useCallback((query: string) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    if (!query) {
+      setLocationResults([]);
+      setShowLocationResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timeout = setTimeout(async () => {
+      try {
+        // First try searching specifically in Mauritania
+        const mauritaniaResponse = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&countrycodes=MR&featuretype=city`
         );
-      } else {
+        const mauritaniaData = await mauritaniaResponse.json();
+
+        // If no results from Mauritania, try global search
+        if (mauritaniaData.length === 0) {
+          const globalResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&featuretype=city`
+          );
+          const globalData = await globalResponse.json();
+          setLocationResults(globalData);
+        } else {
+          setLocationResults(mauritaniaData);
+        }
+
+        setShowLocationResults(true);
+      } catch (error) {
+        console.error('Error searching location:', error);
         setErrors({
           ...errors,
-          location: "Geolocation is not supported by this browser."
+          location: 'Failed to search location. Please try again.'
         });
+      } finally {
+        setIsSearching(false);
       }
-    } else {
-      // Clear location data when toggling off
-      setFormData({
-        ...formData,
-        latitude: '',
-        longitude: ''
-      });
-    }
-    setUseLocation(!useLocation);
+    }, 300);
+
+    setSearchTimeout(timeout);
+  }, [searchTimeout, errors]);
+
+  const handleLocationSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocationSearch(value);
+    debouncedSearch(value);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
+
+  const handleLocationSelect = (location: any) => {
+    setFormData({
+      ...formData,
+      location: location.display_name,
+      latitude: location.lat,
+      longitude: location.lon
+    });
+    setLocationSearch(location.display_name.split(',')[0]);
+    setShowLocationResults(false);
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.location;
+      return newErrors;
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -102,11 +149,21 @@ const Register: React.FC = () => {
     setLoading(true);
     setErrors({});
 
+    // Validate location
+    if (!formData.latitude || !formData.longitude) {
+      setErrors({
+        ...errors,
+        location: 'Please select a valid location'
+      });
+      setLoading(false);
+      return;
+    }
+
     // Convert latitude and longitude to numbers if provided
     const userData: UserData = {
       ...formData,
-      latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-      longitude: formData.longitude ? parseFloat(formData.longitude) : null
+      latitude: parseFloat(formData.latitude),
+      longitude: parseFloat(formData.longitude)
     };
 
     try {
@@ -131,9 +188,21 @@ const Register: React.FC = () => {
     }
   };
 
+  // Add form validation function
+  const isFormValid = (): boolean => {
+    return (
+      formData.username.trim() !== '' &&
+      formData.email.trim() !== '' &&
+      formData.password.trim() !== '' &&
+      formData.password2.trim() !== '' &&
+      formData.latitude.trim() !== '' &&
+      formData.longitude.trim() !== ''
+    );
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen py-4">
-      <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg shadow-md overflow-hidden max-w-md w-full mx-auto transition-colors duration-200 max-h-[550px] overflow-y-auto`}>
+      <div className={`${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg shadow-md w-full max-w-md mx-auto transition-colors duration-200`}>
         {/* Theme toggle button */}
         <div className="absolute top-4 right-4">
           <button 
@@ -145,26 +214,25 @@ const Register: React.FC = () => {
           </button>
         </div>
 
-        {/* Logo space - reduced height */}
-        <div className={`flex justify-center items-center py-3 ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
+        {/* Logo space */}
+        <div className={`flex justify-center items-center py-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
           <div className="h-12 w-32 flex items-center justify-center text-purple-600">
-            {/* Logo will be placed here */}
             <img src="https://fagzgyrlxrpvniypexil.supabase.co/storage/v1/object/public/marketing//logo.png" alt="Thimar Logo" className="w-full h-full object-contain rounded-2xl" />
           </div>
         </div>
         
-        <div className="px-6 py-4">
+        <div className="px-6 py-6">
           <h2 className={`text-xl font-semibold text-center ${theme === 'dark' ? 'text-white' : 'text-gray-800'} mb-1`}>Create an Account</h2>
-          <p className={`text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'} mb-3 text-sm`}>Sign up to get started</p>
+          <p className={`text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'} mb-6 text-sm`}>Sign up to get started</p>
           
           {errors.general && (
-            <div className={`${theme === 'dark' ? 'bg-red-900 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-600'} border px-3 py-2 rounded mb-3 flex items-center gap-2 text-sm`}>
+            <div className={`${theme === 'dark' ? 'bg-red-900 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-600'} border px-3 py-2 rounded mb-4 flex items-center gap-2 text-sm`}>
               <AlertCircle size={14} />
               <span>{errors.general}</span>
             </div>
           )}
           
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username field */}
             <div>
               <label className={`block ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} text-xs font-medium mb-1`} htmlFor="username">
@@ -176,7 +244,7 @@ const Register: React.FC = () => {
                 </div>
                 <input
                   className={`appearance-none border ${errors.username ? (theme === 'dark' ? 'border-red-500' : 'border-red-300') : (theme === 'dark' ? 'border-gray-600' : 'border-gray-200')} 
-                  rounded-md w-full py-2 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
+                  rounded-md w-full py-2.5 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
                   focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm`}
                   id="username"
                   type="text"
@@ -206,7 +274,7 @@ const Register: React.FC = () => {
                 </div>
                 <input
                   className={`appearance-none border ${errors.email ? (theme === 'dark' ? 'border-red-500' : 'border-red-300') : (theme === 'dark' ? 'border-gray-600' : 'border-gray-200')} 
-                  rounded-md w-full py-2 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
+                  rounded-md w-full py-2.5 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
                   focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm`}
                   id="email"
                   type="email"
@@ -236,7 +304,7 @@ const Register: React.FC = () => {
                 </div>
                 <input
                   className={`appearance-none border ${errors.password ? (theme === 'dark' ? 'border-red-500' : 'border-red-300') : (theme === 'dark' ? 'border-gray-600' : 'border-gray-200')} 
-                  rounded-md w-full py-2 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
+                  rounded-md w-full py-2.5 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
                   focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm`}
                   id="password"
                   type="password"
@@ -266,7 +334,7 @@ const Register: React.FC = () => {
                 </div>
                 <input
                   className={`appearance-none border ${errors.password2 ? (theme === 'dark' ? 'border-red-500' : 'border-red-300') : (theme === 'dark' ? 'border-gray-600' : 'border-gray-200')} 
-                  rounded-md w-full py-2 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
+                  rounded-md w-full py-2.5 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
                   focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm`}
                   id="password2"
                   type="password"
@@ -285,35 +353,76 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Location checkbox */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
+            {/* Location field */}
+            <div className="relative">
+              <label className={`block ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} text-xs font-medium mb-1`} htmlFor="location">
+                Location
+              </label>
+              <div className="relative">
+                <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`}>
+                  <MapPin size={16} />
+                </div>
                 <input
-                  id="useLocation"
-                  type="checkbox"
-                  checked={useLocation}
-                  onChange={handleLocationToggle}
-                  className={`h-4 w-4 rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-500' : 'bg-white border-gray-300'}`}
+                  className={`appearance-none border ${errors.location ? (theme === 'dark' ? 'border-red-500' : 'border-red-300') : (theme === 'dark' ? 'border-gray-600' : 'border-gray-200')} 
+                  rounded-md w-full py-2.5 pl-10 pr-3 ${theme === 'dark' ? 'text-white bg-gray-700' : 'text-gray-700 bg-white'} leading-tight 
+                  focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-colors text-sm`}
+                  id="location"
+                  type="text"
+                  placeholder="Search for a city (e.g. Nouakchott, Marrakesh)"
+                  value={locationSearch}
+                  onChange={handleLocationSearch}
                 />
-                <label className={`${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'} text-sm`} htmlFor="useLocation">
-                  Use my current location for prayer times
-                </label>
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  {isSearching ? (
+                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <Search size={16} className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'}`} />
+                  )}
+                </div>
               </div>
-              
+              {showLocationResults && (
+                <div className={`absolute z-10 w-full mt-1 ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'} rounded-md shadow-lg max-h-48 overflow-y-auto`}>
+                  {isSearching ? (
+                    <div className={`px-4 py-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
+                      Searching...
+                    </div>
+                  ) : locationResults.length > 0 ? (
+                    locationResults.map((result, index) => (
+                      <div
+                        key={index}
+                        className={`px-4 py-2 cursor-pointer hover:${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-100'} text-sm truncate`}
+                        onClick={() => handleLocationSelect(result)}
+                        title={result.display_name}
+                      >
+                        {result.display_name.split(',')[0]}
+                        {result.type === 'city' && <span className="ml-2 text-xs opacity-70">City</span>}
+                      </div>
+                    ))
+                  ) : locationSearch ? (
+                    <div className={`px-4 py-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-500'}`}>
+                      No locations found
+                    </div>
+                  ) : null}
+                </div>
+              )}
               {errors.location && (
-                <p className={`${theme === 'dark' ? 'text-red-400' : 'text-red-500'} text-xs mb-2 flex items-center gap-1`}>
+                <p className={`${theme === 'dark' ? 'text-red-400' : 'text-red-500'} text-xs mt-1 flex items-center gap-1`}>
                   <AlertCircle size={10} />
                   {errors.location}
                 </p>
               )}
             </div>
             
-            <div className="pt-1">
+            <div className="pt-2">
               <button
-                className={`${theme === 'dark' ? 'bg-purple-700 hover:bg-purple-600' : 'bg-purple-600 hover:bg-purple-700'} text-white font-medium py-2 px-4 rounded-md 
-                  focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 w-full transition-all flex items-center justify-center gap-2 text-sm`}
+                className={`${theme === 'dark' ? 'bg-purple-700 hover:bg-purple-600' : 'bg-purple-600 hover:bg-purple-700'} text-white font-medium py-2.5 px-4 rounded-md 
+                  focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 w-full transition-all flex items-center justify-center gap-2 text-sm
+                  ${!isFormValid() ? 'opacity-50 cursor-not-allowed' : ''}`}
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isFormValid()}
               >
                 {loading ? (
                   <>
@@ -332,7 +441,7 @@ const Register: React.FC = () => {
               </button>
             </div>
             
-            <div className={`text-center ${theme === 'dark' ? 'text-gray-300 border-gray-700' : 'text-gray-500 border-gray-100'} pt-2 mt-1 border-t text-sm`}>
+            <div className={`text-center ${theme === 'dark' ? 'text-gray-300 border-gray-700' : 'text-gray-500 border-gray-100'} pt-3 mt-2 border-t text-sm`}>
               <p>
                 Already have an account?{' '}
                 <Link to="/login" className={`${theme === 'dark' ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-700'} font-medium`}>

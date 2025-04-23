@@ -6,6 +6,8 @@ import {
   ChevronDown,
   LogOut,
   Settings,
+  User,
+  HelpCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,6 +32,14 @@ import {
 } from "@/components/ui/sidebar";
 import { logoutUser } from "@/services/auth";
 import { useAuth } from "@/context/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const data = [
   [
@@ -66,6 +76,7 @@ export function ProfileActions() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -85,47 +96,82 @@ export function ProfileActions() {
     return currentUser.username.substring(0, 2).toUpperCase();
   };
 
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 px-0.5 w-max data-[state=open]:bg-accent"
-        >
-          <Avatar className="!size-6">
-            <AvatarImage src="https://avatars.githubusercontent.com/u/98880087" />
-            <AvatarFallback>{getUserInitials()}</AvatarFallback>
-          </Avatar>
+  const menuItems = [
+    { label: "Profile", icon: User, onClick: () => navigate("/profile") },
+    { label: "Settings", icon: Settings, onClick: () => navigate("/settings") },
+    { label: "Help", icon: HelpCircle, onClick: () => navigate("/help") },
+    { label: "Log out", icon: LogOut, onClick: () => setShowLogoutDialog(true) },
+  ];
 
-          <span className="font-medium">{currentUser?.username || "User"}</span>
-          <ChevronDown />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="!w-56 overflow-hidden rounded-lg !p-0"
-        align="start"
-      >
-        <Sidebar collapsible="none" className="bg-transparent">
-          <SidebarContent className="!p-0">
-            {data.map((group, index) => (
-              <SidebarGroup key={index} className="border-b last:border-none">
+  return (
+    <>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 px-0.5 w-max data-[state=open]:bg-accent"
+          >
+            <Avatar className="!size-6">
+              <AvatarImage src="https://avatars.githubusercontent.com/u/98880087" />
+              <AvatarFallback>{getUserInitials()}</AvatarFallback>
+            </Avatar>
+
+            <span className="font-medium">{currentUser?.username || "User"}</span>
+            <ChevronDown />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="!w-56 overflow-hidden rounded-lg !p-0"
+          align="start"
+        >
+          <Sidebar collapsible="none" className="bg-transparent">
+            <SidebarContent className="!p-0">
+              <SidebarGroup>
                 <SidebarGroupContent className="gap-0">
                   <SidebarMenu>
-                    {group.map((item, index) => (
-                      <SidebarMenuItem key={index}>
-                        <SidebarMenuButton onClick={item.label === "Log out" ? handleLogout : undefined}>
-                          <item.icon /> <span>{item.label}</span>
+                    {menuItems.map((item) => (
+                      <SidebarMenuItem key={item.label}>
+                        <SidebarMenuButton onClick={item.onClick}>
+                          <item.icon className="w-5 h-5" />
+                          <span className="hidden md:inline">{item.label}</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
-            ))}
-          </SidebarContent>
-        </Sidebar>
-      </PopoverContent>
-    </Popover>
+            </SidebarContent>
+          </Sidebar>
+        </PopoverContent>
+      </Popover>
+
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out? You'll need to sign in again to access your account.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              className="w-full sm:w-auto"
+            >
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
