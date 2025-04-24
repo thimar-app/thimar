@@ -371,7 +371,7 @@ export default function ThimarLanding() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-7xl">
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">Begin Your Journey Towards Balanced Productivity</h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto">
-            Join thousands of Muslims who have transformed their productivity while strengthening their faith with Thimar.
+            Join a growing community of Muslims enhancing their productivity and deepening their faith with Thimar.
           </p>
           <button className="bg-white text-purple-800 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-lg font-medium text-sm sm:text-base md:text-lg hover:bg-purple-100 transition-colors">
             <Link to="/register">Start Your Free Trial</Link>
